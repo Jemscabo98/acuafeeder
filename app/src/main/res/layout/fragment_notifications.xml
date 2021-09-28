@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.notifications.NotificationsFragment"
+    android:background="@drawable/fondo"
+    android:paddingTop="10dp">
+
+    <LinearLayout
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="60dp"
+        android:layout_gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:orientation="horizontal"
+            android:background="@drawable/square">
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="@dimen/texto"
+                android:textColor="@color/white"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:textStyle="bold"
+                android:text="@string/alertaNombre"/>
+
+            <EditText
+                android:id="@+id/txt_nombreAlerta"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:background="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:orientation="horizontal"
+            android:background="@drawable/square"
+            android:backgroundTint="@color/blue">
+
+            <TextView
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="@dimen/texto"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="@string/alertaCorreo"/>
+
+            <EditText
+                android:id="@+id/txt_correo"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:background="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:orientation="horizontal"
+            android:background="@drawable/square">
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="@dimen/texto"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="@string/alertaTempMin"/>
+
+            <EditText
+                android:id="@+id/txt_tempMax"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:background="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:orientation="horizontal"
+            android:background="@drawable/square"
+            android:backgroundTint="@color/blue">
+
+            <TextView
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="@dimen/texto"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="@string/alertaTempMax"/>
+
+            <EditText
+                android:id="@+id/txt_tempMin"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:background="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/alertasBtnGuardar"
+                android:layout_width="220dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/darK_blue"
+                android:text="@string/btnGuardar"
+                android:textSize="@dimen/texto"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
