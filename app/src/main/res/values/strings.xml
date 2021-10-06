@@ -2,16 +2,18 @@
     <string name="app_name">Acuafeeder</string>
     <string name="title_home">Inicio</string>
     <string name="title_dashboard">Programa</string>
-    <string name="title_notifications">Alertas</string>
-    <string name="title_devices">Informacion</string>
+    <string name="title_notifications">Datos</string>
+    <string name="title_devices">Devices</string>
     <string name="title_manual">Manual</string>
 
     <string name="piscina">MODO MANUAL</string>
+    <string name="numPiscina">Piscina: </string>
     <string name="feeder">FEEDER</string>
     <string name="ON">ON</string>
     <string name="OFF">OFF</string>
     <string name="btnEntrar">Entrar</string>
     <string name="btnSalir">Salir</string>
+    <string name="btnBuscar">Buscar</string>
 
     <string name="introInicio">HISTORIAL DE BALANCEADO DOSIFICADO</string>
 

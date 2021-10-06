@@ -21,22 +21,45 @@
             android:layout_height="75dp"
             android:src="@drawable/carridea_control"/>
 
+
         <LinearLayout
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="32dp">
+            android:layout_marginLeft="32dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
 
-            <ImageView
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/temp"/>
+                android:text="@string/numPiscina"
+                android:textColor="@color/white"
+                android:layout_gravity="center"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:id="@+id/txtNumPiscina"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:background="@color/white"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:text="1"/>
+
+            <Button
+                android:id="@+id/btnBuscarDispositivos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="60dp"
+                android:text="@string/btnBuscar"/>
+
         </LinearLayout>
 
         <TextView
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="22dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/introInicio"
@@ -44,6 +67,7 @@
             android:textSize="17sp"
             android:textStyle="bold"
             android:textColor="@color/white"/>
+
 
         <com.jjoe64.graphview.GraphView
             android:layout_marginRight="8dp"

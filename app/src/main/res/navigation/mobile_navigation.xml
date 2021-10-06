@@ -12,22 +12,22 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="montoya.eduardo.acuafeeder.InformationFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_informacion" />
+
+    <fragment
         android:id="@+id/navigation_dashboard"
         android:name="montoya.eduardo.acuafeeder.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="montoya.eduardo.acuafeeder.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
-
-    <fragment
         android:id="@+id/navigation_devices"
-        android:name="montoya.eduardo.acuafeeder.Informacion"
+        android:name="montoya.eduardo.acuafeeder.ui.notifications.NotificationsFragment"
         android:label="@string/title_devices"
-        tools:layout="@layout/fragment_informacion" />
+        tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/navigation_manual"

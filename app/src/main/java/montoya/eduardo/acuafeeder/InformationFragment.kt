@@ -14,7 +14,7 @@ import java.sql.Time
 import java.text.SimpleDateFormat
 
 
-class Informacion : Fragment() {
+class InformationFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
