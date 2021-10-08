@@ -30,8 +30,7 @@ import java.text.SimpleDateFormat
 
 
 class HomeFragment : Fragment() {
-    //val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
-    val URL = "http://practicaspro.webhop.me:8080/acuafeeder/"
+    val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var queue: RequestQueue
     private lateinit var listaComandos: ArrayList<Command>

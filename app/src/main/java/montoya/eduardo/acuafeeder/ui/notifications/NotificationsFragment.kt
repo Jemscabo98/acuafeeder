@@ -18,8 +18,8 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class NotificationsFragment : Fragment() {
-    //val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
-    val URL = "http://practicaspro.webhop.me:8080/acuafeeder/"
+    val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
+    //val URL = "http://practicaspro.webhop.me:8080/acuafeeder/"
 
     private lateinit var notificationsViewModel: NotificationsViewModel
     private lateinit var listaDispositivos: ArrayList<Devices>
