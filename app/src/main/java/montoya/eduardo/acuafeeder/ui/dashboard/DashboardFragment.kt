@@ -98,7 +98,7 @@ class DashboardFragment : Fragment() {
                                 txtBuscarAlimento.setText(jsonObject.getInt("alimentoGrPorSegundo").toString())
                                 txtBuscarProveedor.setText(jsonObject.getString("proveedor"))
                             } catch (error: JSONException) {
-                                Toast.makeText(context, "No se encuantra el producto", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "No se encuentra el producto", Toast.LENGTH_SHORT).show()
                             }
                         }
 

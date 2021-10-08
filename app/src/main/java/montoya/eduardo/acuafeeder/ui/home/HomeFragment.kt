@@ -2,11 +2,14 @@ package montoya.eduardo.acuafeeder.ui.home
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,26 +18,28 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
 import montoya.eduardo.acuafeeder.R
-import montoya.eduardo.acuafeeder.data_class.Devices
+import montoya.eduardo.acuafeeder.data_class.Command
 import org.json.JSONException
 import org.json.JSONObject
-import kotlin.math.roundToInt
+import java.sql.Time
+import java.text.SimpleDateFormat
+
 
 class HomeFragment : Fragment() {
     //val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
     val URL = "http://practicaspro.webhop.me:8080/acuafeeder/"
-
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var queue: RequestQueue
-    private lateinit var listaDispositivos: ArrayList<Devices>
+    private lateinit var listaComandos: ArrayList<Command>
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         homeViewModel =
                 ViewModelProvider(this).get(HomeViewModel::class.java)
@@ -43,34 +48,58 @@ class HomeFragment : Fragment() {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
             val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
             val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
+            var sdf: SimpleDateFormat = SimpleDateFormat("HH:mm")
+            listaComandos = ArrayList()
 
+            //Cuando se le de click al boton
             btnBuscar.setOnClickListener {
+                //Verifica que el dato sea un numero
+                if (checarDato(txtNumPiscina)) {
+                    try {
+                        //Obtiene los datos de la BD
+                        obtenerDatosBD(txtNumPiscina)
 
-                if(checarDato(txtNumPiscina)){
+                        //Hace un retraso de .5 segundos en lo que procesa los datos
+                        val handler = Handler()
+                        handler.postDelayed(Runnable {
+                            graph.removeAllSeries()
+                            val series = BarGraphSeries(getDataBD())
+                            series.setSpacing(20)
+                            series.setDrawValuesOnTop(true);
+                            series.setValuesOnTopColor(Color.WHITE);
+                            graph.addSeries(series)
 
+                            if(!listaComandos.isEmpty()){
+                                var labels = ArrayList<String>()
 
-                }else{
-                    Toast.makeText(context, "Favor de solo usar números en piscina", Toast.LENGTH_LONG).show()
+                                for (x in listaComandos) {
+                                    if (x.horario_inicial_min.toString().length != 2){
+                                        labels.add("" + x.horario_inicial_hr + ":0" + x.horario_inicial_min)
+                                    }else{
+                                        labels.add("" + x.horario_inicial_hr + ":" + x.horario_inicial_min)
+                                    }
+                                }
+                                var stockArr = arrayOfNulls<String>(labels.size)
+                                stockArr = labels.toArray(stockArr)
+
+                                var labelX: StaticLabelsFormatter = StaticLabelsFormatter(graph)
+                                labelX.setHorizontalLabels(stockArr)
+                                graph.gridLabelRenderer.labelFormatter = labelX
+                            }else{
+                                Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
+                            }
+
+                        }, 500)
+                    } catch (ex: Exception) {
+
+                    }
+
+                } else {
+                    Toast.makeText(context,
+                        "Favor de solo usar números en piscina",
+                        Toast.LENGTH_LONG).show()
                 }
             }
-
-
-
-            val series = BarGraphSeries(arrayOf(
-                DataPoint(0.toDouble(), 0.0),
-                DataPoint(1.0, 5.2.roundToInt().toDouble()),
-                DataPoint(2.0, 3.7.roundToInt().toDouble()),
-                DataPoint(3.0, 5.9.roundToInt().toDouble()),
-                DataPoint(4.0, 1.63.roundToInt().toDouble()),
-                DataPoint(5.0, 3.4.roundToInt().toDouble()),
-                DataPoint(6.0, 5.6.roundToInt().toDouble()),
-                DataPoint(7.0, 1.1.roundToInt().toDouble())
-            ));
-            series.setSpacing(20)
-            series.setDrawValuesOnTop(true);
-            series.setValuesOnTopColor(Color.WHITE);
-            graph.addSeries(series)
-
         })
         return root
     }
@@ -85,54 +114,55 @@ class HomeFragment : Fragment() {
         return respuesta
     }
 
-    //Guarda en una lista los dispositivos de la BD
-    fun obtenerListaDevices(numPisina: Int) {
-        val URLAux = URL + "buscar_dispositivos.php?devices_piscina=" + numPisina + ""
+    //Obtener datos de BD
+    fun obtenerDatosBD(txtNumPiscina: EditText){
+        var URLAux = URL + "buscar_commandoXalberca.php?piscina=" + txtNumPiscina.getText() + ""
+        listaComandos.clear()
 
-
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
+        var jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
             Request.Method.GET,
             URLAux,
             null,
 
             {
                 var jsonObject: JSONObject? = null
-                listaDispositivos.clear()
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        var dispo: Devices = Devices(jsonObject.getString("devices_etiqueta"))
-                        dispo.idDevices = jsonObject.getString("idDevice")
-                        dispo.userID = jsonObject.getString("devices_user_id").toInt()
+                        var command = Command(txtNumPiscina.getText().toString().toInt())
+                        command.horario_inicial_hr = jsonObject.getInt("horario_inicial_hr")
+                        command.horario_inicial_min = jsonObject.getInt("horario_inicial_min")
+                        command.horario_final_hr = jsonObject.getInt("horario_final_hr")
+                        command.horario_final_min = jsonObject.getInt("horario_final_min")
+                        command.porcentajeAlimento = jsonObject.getInt("porcentajeAlimento")
+                        command.s = jsonObject.getInt("s")
 
-                        listaDispositivos.add(dispo)
+                        listaComandos.add(command)
 
                     } catch (error: JSONException) {
-                        Toast.makeText(context, "No se encuantran dispositivos en la piscina", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
                     }
                 }
-
             },
 
             {
-                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "No se encuentran datos con este num. de piscina", Toast.LENGTH_LONG).show()
             })
 
         queue = Volley.newRequestQueue(context)
         queue.add(jsonArrayRequest)
     }
 
-    //Carga la lista de dispositivos en el combo box
-    fun cargarLista(txtNumPiscina: EditText, cmbDispositivos: Spinner){
-        var lista: ArrayList<String> = ArrayList()
+    fun getDataBD(): Array<DataPoint> {
+        var arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
 
-        for(x in listaDispositivos){
-            lista.add(x.devices_etiqueta)
+        var aux: Int = 1
+        for (x in listaComandos){
+            arrayListLineaTemp.add(DataPoint(aux.toDouble(), x.porcentajeAlimento.toDouble()))
+            aux++
         }
 
-        var adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, lista.toArray())
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        cmbDispositivos.adapter = adapter
+        var arrayLineaTemp: Array<DataPoint> = arrayListLineaTemp.toTypedArray()
+        return arrayLineaTemp
     }
-
 }
