@@ -64,21 +64,32 @@ class HomeFragment : Fragment() {
                         handler.postDelayed(Runnable {
                             graph.removeAllSeries()
                             val series = BarGraphSeries(getDataBD())
-                            series.setSpacing(20)
-                            series.setDrawValuesOnTop(true);
-                            series.setValuesOnTopColor(Color.WHITE);
+                            series.spacing = 20
+                            series.isDrawValuesOnTop = true
+                            series.valuesOnTopColor = Color.WHITE
+                            graph.viewport.isYAxisBoundsManual = true
+                            graph.viewport.setMinY(0.0)
                             graph.addSeries(series)
+
 
                             if(!listaComandos.isEmpty()){
                                 var labels = ArrayList<String>()
+                                var maxValue: Double = 0.0
 
                                 for (x in listaComandos) {
+
+                                    if (x.porcentajeAlimento>maxValue)
+                                        maxValue = x.porcentajeAlimento.toDouble()
+
                                     if (x.horario_inicial_min.toString().length != 2){
                                         labels.add("" + x.horario_inicial_hr + ":0" + x.horario_inicial_min)
                                     }else{
                                         labels.add("" + x.horario_inicial_hr + ":" + x.horario_inicial_min)
                                     }
                                 }
+
+                                maxValue += 20.0
+                                graph.viewport.setMaxY(maxValue)
                                 var stockArr = arrayOfNulls<String>(labels.size)
                                 stockArr = labels.toArray(stockArr)
 
