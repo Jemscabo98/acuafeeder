@@ -1,8 +1,7 @@
 package montoya.eduardo.acuafeeder.ui.home
 
 import android.graphics.Color
-import android.os.Bundle
-import android.os.Handler
+import android.os.*
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
@@ -21,11 +21,12 @@ import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
+import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.Command
+import montoya.eduardo.acuafeeder.data_class.GlobalData
 import org.json.JSONException
 import org.json.JSONObject
-import java.sql.Time
 import java.text.SimpleDateFormat
 
 
@@ -33,7 +34,6 @@ class HomeFragment : Fragment() {
     val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var queue: RequestQueue
-    private lateinit var listaComandos: ArrayList<Command>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,61 +48,18 @@ class HomeFragment : Fragment() {
             val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
             val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
             var sdf: SimpleDateFormat = SimpleDateFormat("HH:mm")
-            listaComandos = ArrayList()
+            GlobalData.listaComandos = ArrayList()
+
+            txtNumPiscina.setText(GlobalData.pool.toString())
+            cargarDatos(graph)
+
 
             //Cuando se le de click al boton
             btnBuscar.setOnClickListener {
                 //Verifica que el dato sea un numero
                 if (checarDato(txtNumPiscina)) {
-                    try {
-                        //Obtiene los datos de la BD
-                        obtenerDatosBD(txtNumPiscina)
-
-                        //Hace un retraso de .5 segundos en lo que procesa los datos
-                        val handler = Handler()
-                        handler.postDelayed(Runnable {
-                            graph.removeAllSeries()
-                            val series = BarGraphSeries(getDataBD())
-                            series.spacing = 20
-                            series.isDrawValuesOnTop = true
-                            series.valuesOnTopColor = Color.WHITE
-                            graph.viewport.isYAxisBoundsManual = true
-                            graph.viewport.setMinY(0.0)
-                            graph.addSeries(series)
-
-
-                            if(!listaComandos.isEmpty()){
-                                var labels = ArrayList<String>()
-                                var maxValue: Double = 0.0
-
-                                for (x in listaComandos) {
-
-                                    if (x.porcentajeAlimento>maxValue)
-                                        maxValue = x.porcentajeAlimento.toDouble()
-
-                                    if (x.horario_inicial_min.toString().length != 2){
-                                        labels.add("" + x.horario_inicial_hr + ":0" + x.horario_inicial_min)
-                                    }else{
-                                        labels.add("" + x.horario_inicial_hr + ":" + x.horario_inicial_min)
-                                    }
-                                }
-
-                                maxValue += 20.0
-                                graph.viewport.setMaxY(maxValue)
-                                var stockArr = arrayOfNulls<String>(labels.size)
-                                stockArr = labels.toArray(stockArr)
-
-                                var labelX: StaticLabelsFormatter = StaticLabelsFormatter(graph)
-                                labelX.setHorizontalLabels(stockArr)
-                                graph.gridLabelRenderer.labelFormatter = labelX
-                            }else{
-                                Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
-                            }
-
-                        }, 500)
-                    } catch (ex: Exception) {
-
-                    }
+                    GlobalData.pool = txtNumPiscina.text.toString().toInt()
+                    cargarDatos(graph)
 
                 } else {
                     Toast.makeText(context,
@@ -125,9 +82,9 @@ class HomeFragment : Fragment() {
     }
 
     //Obtener datos de BD
-    fun obtenerDatosBD(txtNumPiscina: EditText){
-        var URLAux = URL + "buscar_commandoXalberca.php?piscina=" + txtNumPiscina.getText() + ""
-        listaComandos.clear()
+    fun obtenerDatosBD(){
+        var URLAux = URL + "buscar_commandoXalberca.php?piscina=" + GlobalData.pool + ""
+        GlobalData.listaComandos.clear()
 
         var jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
             Request.Method.GET,
@@ -139,7 +96,7 @@ class HomeFragment : Fragment() {
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        var command = Command(txtNumPiscina.getText().toString().toInt())
+                        var command = Command(GlobalData.pool)
                         command.horario_inicial_hr = jsonObject.getInt("horario_inicial_hr")
                         command.horario_inicial_min = jsonObject.getInt("horario_inicial_min")
                         command.horario_final_hr = jsonObject.getInt("horario_final_hr")
@@ -147,7 +104,7 @@ class HomeFragment : Fragment() {
                         command.porcentajeAlimento = jsonObject.getInt("porcentajeAlimento")
                         command.s = jsonObject.getInt("s")
 
-                        listaComandos.add(command)
+                        GlobalData.listaComandos.add(command)
 
                     } catch (error: JSONException) {
                         Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
@@ -156,18 +113,75 @@ class HomeFragment : Fragment() {
             },
 
             {
-                Toast.makeText(context, "No se encuentran datos con este num. de piscina", Toast.LENGTH_LONG).show()
+                Toast.makeText(context,
+                    "No se encuentran datos con este num. de piscina",
+                    Toast.LENGTH_LONG).show()
             })
 
         queue = Volley.newRequestQueue(context)
         queue.add(jsonArrayRequest)
     }
 
+    fun cargarDatos(graph: GraphView){
+        try {
+            //Obtiene los datos de la BD
+            obtenerDatosBD()
+
+            //Hace un retraso de .5 segundos en lo que procesa los datos
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed(Runnable {
+                // Limpi la grafica cada vez que se busque datos
+                graph.removeAllSeries()
+                // Tipo de grafica /barra/
+                val series = BarGraphSeries(getDataBD())
+                //Valores de la grafica
+                series.spacing = 20
+                series.isDrawValuesOnTop = true
+                series.valuesOnTopColor = Color.WHITE
+                graph.viewport.isYAxisBoundsManual = true
+                graph.viewport.setMinY(0.0)
+                graph.addSeries(series)
+
+                //Se agrega los tag (hora) en la axis x
+                if (!GlobalData.listaComandos.isEmpty()) {
+                    var labels = ArrayList<String>()
+                    var maxValue: Double = 0.0
+
+                    for (x in GlobalData.listaComandos) {
+
+                        if (x.porcentajeAlimento > maxValue)
+                            maxValue = x.porcentajeAlimento.toDouble()
+
+                        if (x.horario_inicial_min.toString().length != 2) {
+                            labels.add("" + x.horario_inicial_hr + ":0" + x.horario_inicial_min)
+                        } else {
+                            labels.add("" + x.horario_inicial_hr + ":" + x.horario_inicial_min)
+                        }
+                    }
+
+                    maxValue += 20.0
+                    graph.viewport.setMaxY(maxValue)
+                    var stockArr = arrayOfNulls<String>(labels.size)
+                    stockArr = labels.toArray(stockArr)
+                    var labelX: StaticLabelsFormatter = StaticLabelsFormatter(graph)
+                    labelX.setHorizontalLabels(stockArr)
+                    graph.gridLabelRenderer.labelFormatter = labelX
+                } else {
+                    Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+            }, 500)
+        } catch (ex: Exception) {
+
+        }
+    }
+
     fun getDataBD(): Array<DataPoint> {
         var arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
 
         var aux: Int = 1
-        for (x in listaComandos){
+        for (x in GlobalData.listaComandos){
             arrayListLineaTemp.add(DataPoint(aux.toDouble(), x.porcentajeAlimento.toDouble()))
             aux++
         }
@@ -176,3 +190,4 @@ class HomeFragment : Fragment() {
         return arrayLineaTemp
     }
 }
+
