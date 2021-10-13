@@ -16,7 +16,7 @@
     <string name="btnBuscar">Buscar</string>
 
     <string name="introInicio">HISTORIAL DE BALANCEADO DOSIFICADO</string>
-    <string name="seleccioneFecha">SELECCIONE UNA FECHA</string>
+    <string name="seleccioneFecha">SELECCIONE UNA FECHA: </string>
 
     <string name="alertaNombre">NOMBRE DE ALERTA</string>
     <string name="alertaCorreo">CORREO</string>

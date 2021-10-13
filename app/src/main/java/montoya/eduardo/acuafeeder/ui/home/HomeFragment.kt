@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat
 
 
 class HomeFragment : Fragment() {
-    val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
@@ -100,7 +99,7 @@ class HomeFragment : Fragment() {
 
     //Obtener datos de BD
     fun obtenerDatosBD(){
-        val URLAux = URL + "buscar_commandoXalberca.php?piscina=" + GlobalData.pool + ""
+        val URLAux = GlobalData.URL + "buscar_commandoXalberca.php?piscina=" + GlobalData.pool + ""
         GlobalData.listaComandos.clear()
 
         val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
@@ -176,6 +175,8 @@ class HomeFragment : Fragment() {
             val labelX: StaticLabelsFormatter = StaticLabelsFormatter(graph)
             labelX.setHorizontalLabels(stockArr)
             graph.gridLabelRenderer.labelFormatter = labelX
+            //graph.gridLabelRenderer.verticalAxisTitle = "% de Alimento"
+            //graph.gridLabelRenderer.verticalAxisTitleColor = Color.WHITE
         } catch (ex: Exception) {
 
         }
