@@ -34,7 +34,6 @@ class HomeFragment : Fragment() {
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
 
-    @SuppressLint("SimpleDateFormat")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,7 +46,6 @@ class HomeFragment : Fragment() {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
             val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
             val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
-            var sdf: SimpleDateFormat = SimpleDateFormat("HH:mm")
             GlobalData.listaComandos = ArrayList()
 
             txtNumPiscina.setText(GlobalData.pool.toString())
@@ -58,7 +56,7 @@ class HomeFragment : Fragment() {
 
                 handler.postDelayed(Runnable {
                     cargarDatos(graph)
-                },500)
+                },25)
             }
             if (!GlobalData.listaComandos.isEmpty()){
                 cargarDatos(graph)
@@ -76,7 +74,7 @@ class HomeFragment : Fragment() {
 
                     handler.postDelayed(Runnable {
                         cargarDatos(graph)
-                     },500)
+                     },25)
                 } else {
                     Toast.makeText(context,
                         "Favor de solo usar números en piscina",
@@ -175,8 +173,6 @@ class HomeFragment : Fragment() {
             val labelX: StaticLabelsFormatter = StaticLabelsFormatter(graph)
             labelX.setHorizontalLabels(stockArr)
             graph.gridLabelRenderer.labelFormatter = labelX
-            //graph.gridLabelRenderer.verticalAxisTitle = "% de Alimento"
-            //graph.gridLabelRenderer.verticalAxisTitleColor = Color.WHITE
         } catch (ex: Exception) {
 
         }

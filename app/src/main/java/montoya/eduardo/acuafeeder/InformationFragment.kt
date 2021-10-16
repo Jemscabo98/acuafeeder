@@ -7,12 +7,13 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -22,33 +23,45 @@ import com.jjoe64.graphview.DefaultLabelFormatter
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
-import montoya.eduardo.acuafeeder.data_class.Command
+import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.temp
 import org.json.JSONException
 import org.json.JSONObject
 import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.coroutines.coroutineContext
 
 
 class InformationFragment : Fragment() {
 
     private lateinit var mDateSetListener: DatePickerDialog.OnDateSetListener
     private lateinit var queue: RequestQueue
+    private val handler = Handler(Looper.getMainLooper())
+    val sdf2: SimpleDateFormat = SimpleDateFormat("HH:mm:ss")
 
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         val root = inflater.inflate(R.layout.fragment_informacion, container, false)
         val graph: GraphView = root.findViewById(R.id.graph) as GraphView
         val selecFecha: TextView = root.findViewById(R.id.selFechaTemp)
+        val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
+        val selectDevice: Spinner = root.findViewById(R.id.selectDevice)
 
-        val sdf: SimpleDateFormat = SimpleDateFormat("hh:mm")
+        if (GlobalData.fechaTemp==""){
+            val cal: Calendar = Calendar.getInstance() //Objeto Calendario
+            GlobalData.fechaTemp = cal.get(Calendar.YEAR).toString() +
+                    "-" + cal.get(Calendar.MONTH).toString() +
+                    "-" + cal.get(Calendar.DAY_OF_MONTH).toString()
+            selecFecha.text = "SELECCIONE UNA FECHA: <${GlobalData.fechaTemp}>"
+        }else{
+            selecFecha.text = "SELECCIONE UNA FECHA: <${GlobalData.fechaTemp}>"
+        }
 
         selecFecha.setOnClickListener {
             //Variables
@@ -61,7 +74,8 @@ class InformationFragment : Fragment() {
             mDateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 Log.d(TAG, "onDateSet: date: $year/$month/$dayOfMonth")
                 var aux: String = "SELECCIONE UNA FECHA: "
-                selecFecha.text = "$aux  <$dayOfMonth/$month/$year>"
+                GlobalData.fechaTemp = "$year-$month-$dayOfMonth"
+                selecFecha.text = "$aux  <$dayOfMonth-$month-$year>"
             }
 
             val selecFechaAux: DatePickerDialog = DatePickerDialog(
@@ -74,46 +88,105 @@ class InformationFragment : Fragment() {
             selecFechaAux.show()
         }
 
+        //Carga el numero de piscina global
+        txtNumPiscina.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE)
 
-        val lineaTemp = LineGraphSeries(getDataBD())
-        lineaTemp.color = Color.RED
+        //Llena la lista del Spinner
+        fillSpinner(selectDevice, context)
 
-        graph.addSeries(lineaTemp)
+        obtenerTempBD()
 
-        graph.getGridLabelRenderer().setLabelFormatter(object : DefaultLabelFormatter() {
-            override fun formatLabel(value: Double, isValueX: Boolean): String {
-                if (isValueX) {
-                    return sdf.format(value)
-                }
-                return super.formatLabel(value, isValueX)
-            }
-        })
-
+        handler.postDelayed(Runnable {
+            graficarResultados(graph)
+        }, 50)
         return root
     }
 
+    fun graficarResultados(graph: GraphView){
+        val lineaTemp = LineGraphSeries(getDataBD())
+        lineaTemp.color = Color.RED
+        if (!GlobalData.listaTemp.isEmpty()){
+
+
+            var tiempo: Time = Time.valueOf(GlobalData.listaTemp[0].time + ":00")
+            val tiempo2: Time = Time.valueOf(GlobalData.listaTemp[GlobalData.listaTemp.size - 1].time + ":00")
+
+            graph.viewport.setMinX(tiempo.time.toDouble())
+            graph.viewport.setMaxX(tiempo2.time.toDouble())
+            graph.viewport.isXAxisBoundsManual = true
+            graph.addSeries(lineaTemp)
+            graph.gridLabelRenderer.setHorizontalLabelsAngle(180)
+            graph.gridLabelRenderer.setLabelFormatter(object : DefaultLabelFormatter() {
+                @SuppressLint("SimpleDateFormat")
+                override fun formatLabel(value: Double, isValueX: Boolean): String {
+                    if (isValueX) {
+                        val sdf: SimpleDateFormat = SimpleDateFormat("HH:mm")
+                        return sdf.format(value)
+                    } else {
+                        return "" + value + " C"
+                    }
+                }
+            })
+        }
+    }
+
     fun getDataBD(): Array<DataPoint> {
+        val arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
+        val listaTiempo: ArrayList<Time> = ArrayList()
+        for (x in GlobalData.listaTemp){
+            val tiempo: Time = Time.valueOf(x.time + ":00")
+            if (!listaTiempo.contains(tiempo)) {
+                listaTiempo.add(tiempo)
+                arrayListLineaTemp.add(DataPoint(tiempo.time.toDouble(), x.temp.toDouble()))
+                //Toast.makeText(context, tiempo.toString() + " " + x.temp, Toast.LENGTH_SHORT).show()
+            }
+        }
+        var arrayLineaTemp = arrayListLineaTemp.toTypedArray()
+
+        return arrayLineaTemp
+    }
+
+    fun getDataBD2(): Array<DataPoint> {
         var arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
-        var tiempo: Time = Time.valueOf("10:18:41")
-        var tiempo2: Time = Time.valueOf("10:20:52")
-        var tiempo3: Time = Time.valueOf("10:22:11")
-        var tiempo4: Time = Time.valueOf("10:24:51")
-        var tiempo5: Time = Time.valueOf("10:26:05")
+        var tiempo: Time = Time.valueOf("01:18:00")
+        var tiempo2: Time = Time.valueOf("02:20:52")
+        var tiempo3: Time = Time.valueOf("03:22:11")
+        var tiempo4: Time = Time.valueOf("08:24:51")
+        var tiempo5: Time = Time.valueOf("09:26:05")
+        var tiempo6: Time = Time.valueOf("10:20:52")
+        var tiempo7: Time = Time.valueOf("12:22:11")
+        var tiempo8: Time = Time.valueOf("13:24:51")
+        var tiempo9: Time = Time.valueOf("14:26:05")
+        var tiempo10: Time = Time.valueOf("18:20:52")
+        var tiempo11: Time = Time.valueOf("19:22:11")
+        var tiempo12: Time = Time.valueOf("20:24:51")
+        var tiempo13: Time = Time.valueOf("23:26:05")
         arrayListLineaTemp.add(DataPoint(tiempo.time.toDouble(), 49.5))
         arrayListLineaTemp.add(DataPoint(tiempo2.time.toDouble(), 45.5))
         arrayListLineaTemp.add(DataPoint(tiempo3.time.toDouble(), 48.5))
         arrayListLineaTemp.add(DataPoint(tiempo4.time.toDouble(), 44.5))
         arrayListLineaTemp.add(DataPoint(tiempo5.time.toDouble(), 49.5))
-
+        arrayListLineaTemp.add(DataPoint(tiempo6.time.toDouble(), 49.5))
+        arrayListLineaTemp.add(DataPoint(tiempo7.time.toDouble(), 45.5))
+        arrayListLineaTemp.add(DataPoint(tiempo8.time.toDouble(), 48.5))
+        arrayListLineaTemp.add(DataPoint(tiempo9.time.toDouble(), 44.5))
+        arrayListLineaTemp.add(DataPoint(tiempo10.time.toDouble(), 49.5))
+        arrayListLineaTemp.add(DataPoint(tiempo11.time.toDouble(), 49.5))
+        arrayListLineaTemp.add(DataPoint(tiempo12.time.toDouble(), 45.5))
+        arrayListLineaTemp.add(DataPoint(tiempo13.time.toDouble(), 48.5))
 
         var arrayLineaTemp: Array<DataPoint> = arrayListLineaTemp.toTypedArray()
         return arrayLineaTemp
     }
 
     //Obtener datos de BD
-    fun obtenerDatosBD(context: Context){
-        val URLAux = GlobalData.URL + "buscar_commandoXalberca.php?piscina=" + GlobalData.pool + ""
-        GlobalData.listaComandos.clear()
+    fun obtenerTempBD(){
+        //val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
+        //        "&idDevice=" + GlobalData.deviceTemp
+
+        val URLAux = GlobalData.URL + "buscar_temp.php?date=2021-07-07&idDevices=CZEUYRM9CP6A"
+        GlobalData.listaTemp.clear()
+        var aux = ""
 
         val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
             Request.Method.GET,
@@ -125,15 +198,50 @@ class InformationFragment : Fragment() {
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        val command = Command(GlobalData.pool)
-                        command.horario_inicial_hr = jsonObject.getInt("horario_inicial_hr")
-                        command.horario_inicial_min = jsonObject.getInt("horario_inicial_min")
-                        command.horario_final_hr = jsonObject.getInt("horario_final_hr")
-                        command.horario_final_min = jsonObject.getInt("horario_final_min")
-                        command.porcentajeAlimento = jsonObject.getInt("porcentajeAlimento")
-                        command.s = jsonObject.getInt("s")
+                        val tmp = temp(jsonObject.getString("time"))
+                        tmp.temp = jsonObject.getString("tempAgua")
+                        if (tmp.time.equals(aux)) {
+                        } else {
+                            aux = tmp.time
+                            GlobalData.listaTemp.add(tmp)
+                        }
 
-                        GlobalData.listaComandos.add(command)
+                    } catch (error: JSONException) {
+                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            },
+
+            {
+                Toast.makeText(context,
+                    "No se encuentran datos con este dispositivo",
+                    Toast.LENGTH_LONG).show()
+            })
+
+        queue = Volley.newRequestQueue(context)
+        queue.add(jsonArrayRequest)
+    }
+
+    fun obtenerDevicesBD(){
+        val URLAux = GlobalData.URL + "buscar_dispositivos.php?devices_piscina=" + GlobalData.pool
+        GlobalData.listaDevices.clear()
+
+        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
+            Request.Method.GET,
+            URLAux,
+            null,
+
+            {
+                var jsonObject: JSONObject? = null
+                for (i in 0 until it.length()) {
+                    try {
+                        jsonObject = it.getJSONObject(i)
+                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"))
+                        device.idDevices = jsonObject.getString("idDevice")
+                        device.userID = jsonObject.getInt("devices_user_id")
+
+                        GlobalData.listaDevices.add(device)
 
                     } catch (error: JSONException) {
                         Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
@@ -143,12 +251,34 @@ class InformationFragment : Fragment() {
 
             {
                 Toast.makeText(context,
-                    "No se encuentran datos con este num. de piscina",
+                    "No se encuentran datos en esta piscina",
                     Toast.LENGTH_LONG).show()
             })
 
         queue = Volley.newRequestQueue(context)
         queue.add(jsonArrayRequest)
+    }
+
+    fun fillSpinner(selectDevice: Spinner, context: Context?){
+        if (context!=null){
+            obtenerDevicesBD();
+            handler.postDelayed(Runnable {
+                val listaAux: ArrayList<String> = ArrayList()
+                for (x in GlobalData.listaDevices) {
+                    listaAux.add(x.devices_etiqueta)
+                }
+
+                val lista = ArrayAdapter(context, android.R.layout.simple_spinner_item, listaAux)
+                lista.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                selectDevice.adapter = lista
+                try {
+                    GlobalData.deviceTemp = GlobalData.listaDevices[0].idDevices
+                } catch (e: java.lang.IndexOutOfBoundsException) {
+
+                }
+            }, 45)
+        }
+
     }
 }
 

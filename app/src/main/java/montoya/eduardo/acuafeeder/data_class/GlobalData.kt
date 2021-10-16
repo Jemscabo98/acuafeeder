@@ -1,6 +1,7 @@
 package montoya.eduardo.acuafeeder.data_class
 
 import android.app.Application
+import com.jjoe64.graphview.series.DataPoint
 
 open class GlobalData: Application() {
    companion object{
@@ -10,7 +11,8 @@ open class GlobalData: Application() {
 
        var listaTemp: ArrayList<temp> = ArrayList()
        var fechaTemp: String = ""
-       var listaDevices: ArrayList<String> = ArrayList()
+       var listaDevices: ArrayList<Devices> = ArrayList()
+       var deviceTemp: String = ""
    }
 
     override fun onCreate() {
