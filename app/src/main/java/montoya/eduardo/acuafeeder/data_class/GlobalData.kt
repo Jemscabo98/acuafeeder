@@ -2,6 +2,8 @@ package montoya.eduardo.acuafeeder.data_class
 
 import android.app.Application
 import com.jjoe64.graphview.series.DataPoint
+import java.util.*
+import kotlin.collections.ArrayList
 
 open class GlobalData: Application() {
    companion object{

@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,7 @@ class InformationFragment : Fragment() {
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
     val sdf2: SimpleDateFormat = SimpleDateFormat("HH:mm:ss")
+    val sdfDay: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun onCreateView(
@@ -49,43 +51,21 @@ class InformationFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_informacion, container, false)
         val graph: GraphView = root.findViewById(R.id.graph) as GraphView
-        val selecFecha: TextView = root.findViewById(R.id.selFechaTemp)
         val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
+        val btnSelecFecha: Button = root.findViewById(R.id.selFechaTemp)
+        val txtSelecFecha: TextView = root.findViewById(R.id.txtFechaTemp)
+        val btnActualizarGraph: Button = root.findViewById(R.id.btnActualizarGraph)
         val selectDevice: Spinner = root.findViewById(R.id.selectDevice)
+        val btnBuscarDispositivos: Button = root.findViewById(R.id.btnBuscarDispositivos)
 
         if (GlobalData.fechaTemp==""){
             val cal: Calendar = Calendar.getInstance() //Objeto Calendario
             GlobalData.fechaTemp = cal.get(Calendar.YEAR).toString() +
                     "-" + cal.get(Calendar.MONTH).toString() +
                     "-" + cal.get(Calendar.DAY_OF_MONTH).toString()
-            selecFecha.text = "SELECCIONE UNA FECHA: <${GlobalData.fechaTemp}>"
+            txtSelecFecha.text = "<${GlobalData.fechaTemp}>"
         }else{
-            selecFecha.text = "SELECCIONE UNA FECHA: <${GlobalData.fechaTemp}>"
-        }
-
-        selecFecha.setOnClickListener {
-            //Variables
-            val cal: Calendar = Calendar.getInstance() //Objeto Calendario
-            val anou = cal.get(Calendar.YEAR) //Donde se guarda el año
-            val mes = cal.get(Calendar.MONTH) //Donde se guarda el mes
-            val dia = cal.get(Calendar.DAY_OF_MONTH) //Donde se guarda el dia
-            val colorAux: ColorDrawable = ColorDrawable(Color.TRANSPARENT)
-
-            mDateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                Log.d(TAG, "onDateSet: date: $year/$month/$dayOfMonth")
-                var aux: String = "SELECCIONE UNA FECHA: "
-                GlobalData.fechaTemp = "$year-$month-$dayOfMonth"
-                selecFecha.text = "$aux  <$dayOfMonth-$month-$year>"
-            }
-
-            val selecFechaAux: DatePickerDialog = DatePickerDialog(
-                this.requireContext(),
-                android.R.style.Theme_Holo_Light_Dialog,
-                mDateSetListener,
-                anou, mes, dia)
-
-            selecFechaAux.window?.setBackgroundDrawable(colorAux)
-            selecFechaAux.show()
+            txtSelecFecha.text = "<${GlobalData.fechaTemp}>"
         }
 
         //Carga el numero de piscina global
@@ -99,23 +79,94 @@ class InformationFragment : Fragment() {
         handler.postDelayed(Runnable {
             graficarResultados(graph)
         }, 50)
+
+
+        btnSelecFecha.setOnClickListener {
+            //Variables
+            val cal: Calendar = Calendar.getInstance() //Objeto Calendario
+            val date: Date = sdfDay.parse(GlobalData.fechaTemp)
+            cal.time = date
+            val anou = cal.get(Calendar.YEAR) //Donde se guarda el año
+            var mes = cal.get(Calendar.MONTH) //Donde se guarda el mes
+            val dia = cal.get(Calendar.DAY_OF_MONTH) //Donde se guarda el dia
+            val colorAux: ColorDrawable = ColorDrawable(Color.TRANSPARENT)
+
+            mDateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                mes = month + 1
+                Log.d(TAG, "onDateSet: date: $year/$mes/$dayOfMonth")
+                GlobalData.fechaTemp = "$year-$mes-$dayOfMonth"
+                txtSelecFecha.text = "<$dayOfMonth-$mes-$year>"
+            }
+
+            val selecFechaAux: DatePickerDialog = DatePickerDialog(
+                this.requireContext(),
+                android.R.style.Theme_Holo_Light_Dialog,
+                mDateSetListener,
+                anou, mes, dia)
+
+            selecFechaAux.window?.setBackgroundDrawable(colorAux)
+            selecFechaAux.show()
+        }
+
+        btnBuscarDispositivos.setOnClickListener {
+            if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
+                GlobalData.pool = txtNumPiscina.text.toString().toInt()
+                //Llena la lista del Spinner
+                fillSpinner(selectDevice, context)
+            }else{
+                Toast.makeText(context,
+                    "Favor de solo usar números en piscina",
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+
+        selectDevice.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                GlobalData.deviceTemp = GlobalData.listaDevices.get(0).idDevices
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                for (x in GlobalData.listaDevices){
+                    if(x.devices_etiqueta == selectDevice.selectedItem.toString()){
+                        GlobalData.deviceTemp = x.idDevices
+                    }
+                }
+            }
+
+        }
+
+        btnActualizarGraph.setOnClickListener {
+            obtenerTempBD()
+
+            handler.postDelayed(Runnable {
+                graficarResultados(graph)
+            }, 50)
+        }
         return root
     }
 
     fun graficarResultados(graph: GraphView){
         val lineaTemp = LineGraphSeries(getDataBD())
         lineaTemp.color = Color.RED
+        // Limpi la grafica cada vez que se busque datos
+        graph.removeAllSeries()
         if (!GlobalData.listaTemp.isEmpty()){
 
 
-            var tiempo: Time = Time.valueOf(GlobalData.listaTemp[0].time + ":00")
+            val tiempo: Time = Time.valueOf(GlobalData.listaTemp[0].time + ":00")
             val tiempo2: Time = Time.valueOf(GlobalData.listaTemp[GlobalData.listaTemp.size - 1].time + ":00")
 
             graph.viewport.setMinX(tiempo.time.toDouble())
             graph.viewport.setMaxX(tiempo2.time.toDouble())
             graph.viewport.isXAxisBoundsManual = true
             graph.addSeries(lineaTemp)
-            graph.gridLabelRenderer.setHorizontalLabelsAngle(180)
+            graph.gridLabelRenderer.setLabelHorizontalHeight(150);
+            graph.gridLabelRenderer.setHorizontalLabelsAngle(135)
             graph.gridLabelRenderer.setLabelFormatter(object : DefaultLabelFormatter() {
                 @SuppressLint("SimpleDateFormat")
                 override fun formatLabel(value: Double, isValueX: Boolean): String {
@@ -123,7 +174,7 @@ class InformationFragment : Fragment() {
                         val sdf: SimpleDateFormat = SimpleDateFormat("HH:mm")
                         return sdf.format(value)
                     } else {
-                        return "" + value + " C"
+                        return "" + String.format("%.1f", value) + " C"
                     }
                 }
             })
@@ -141,50 +192,19 @@ class InformationFragment : Fragment() {
                 //Toast.makeText(context, tiempo.toString() + " " + x.temp, Toast.LENGTH_SHORT).show()
             }
         }
-        var arrayLineaTemp = arrayListLineaTemp.toTypedArray()
+        val arrayLineaTemp = arrayListLineaTemp.toTypedArray()
 
         return arrayLineaTemp
     }
 
-    fun getDataBD2(): Array<DataPoint> {
-        var arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
-        var tiempo: Time = Time.valueOf("01:18:00")
-        var tiempo2: Time = Time.valueOf("02:20:52")
-        var tiempo3: Time = Time.valueOf("03:22:11")
-        var tiempo4: Time = Time.valueOf("08:24:51")
-        var tiempo5: Time = Time.valueOf("09:26:05")
-        var tiempo6: Time = Time.valueOf("10:20:52")
-        var tiempo7: Time = Time.valueOf("12:22:11")
-        var tiempo8: Time = Time.valueOf("13:24:51")
-        var tiempo9: Time = Time.valueOf("14:26:05")
-        var tiempo10: Time = Time.valueOf("18:20:52")
-        var tiempo11: Time = Time.valueOf("19:22:11")
-        var tiempo12: Time = Time.valueOf("20:24:51")
-        var tiempo13: Time = Time.valueOf("23:26:05")
-        arrayListLineaTemp.add(DataPoint(tiempo.time.toDouble(), 49.5))
-        arrayListLineaTemp.add(DataPoint(tiempo2.time.toDouble(), 45.5))
-        arrayListLineaTemp.add(DataPoint(tiempo3.time.toDouble(), 48.5))
-        arrayListLineaTemp.add(DataPoint(tiempo4.time.toDouble(), 44.5))
-        arrayListLineaTemp.add(DataPoint(tiempo5.time.toDouble(), 49.5))
-        arrayListLineaTemp.add(DataPoint(tiempo6.time.toDouble(), 49.5))
-        arrayListLineaTemp.add(DataPoint(tiempo7.time.toDouble(), 45.5))
-        arrayListLineaTemp.add(DataPoint(tiempo8.time.toDouble(), 48.5))
-        arrayListLineaTemp.add(DataPoint(tiempo9.time.toDouble(), 44.5))
-        arrayListLineaTemp.add(DataPoint(tiempo10.time.toDouble(), 49.5))
-        arrayListLineaTemp.add(DataPoint(tiempo11.time.toDouble(), 49.5))
-        arrayListLineaTemp.add(DataPoint(tiempo12.time.toDouble(), 45.5))
-        arrayListLineaTemp.add(DataPoint(tiempo13.time.toDouble(), 48.5))
-
-        var arrayLineaTemp: Array<DataPoint> = arrayListLineaTemp.toTypedArray()
-        return arrayLineaTemp
-    }
 
     //Obtener datos de BD
     fun obtenerTempBD(){
-        //val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
-        //        "&idDevice=" + GlobalData.deviceTemp
+        val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
+                "&idDevices=" + GlobalData.deviceTemp
 
-        val URLAux = GlobalData.URL + "buscar_temp.php?date=2021-07-07&idDevices=CZEUYRM9CP6A"
+        //val URLAux = GlobalData.URL + "buscar_temp.php?date=2021-07-07&idDevices=CZEUYRM9CP6A"
+        Log.d(TAG, "URL: $URLAux")
         GlobalData.listaTemp.clear()
         var aux = ""
 
@@ -215,7 +235,7 @@ class InformationFragment : Fragment() {
 
             {
                 Toast.makeText(context,
-                    "No se encuentran datos con este dispositivo",
+                    "No se encuentran datos con los datos ingresados ",
                     Toast.LENGTH_LONG).show()
             })
 
@@ -269,7 +289,7 @@ class InformationFragment : Fragment() {
                 }
 
                 val lista = ArrayAdapter(context, android.R.layout.simple_spinner_item, listaAux)
-                lista.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                lista.setDropDownViewResource(R.layout.spinner_dropdown_item)
                 selectDevice.adapter = lista
                 try {
                     GlobalData.deviceTemp = GlobalData.listaDevices[0].idDevices
