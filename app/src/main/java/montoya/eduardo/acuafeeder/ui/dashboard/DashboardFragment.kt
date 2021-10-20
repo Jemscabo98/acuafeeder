@@ -1,31 +1,22 @@
 package montoya.eduardo.acuafeeder.ui.dashboard
 
-import android.app.VoiceInteractor
-import android.graphics.Color
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.volley.*
-import com.android.volley.Request.Method.POST
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.BarGraphSeries
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
+import montoya.eduardo.acuafeeder.EditCommand
+import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
+import montoya.eduardo.acuafeeder.data_class.Command
+import montoya.eduardo.acuafeeder.data_class.GlobalData
 
 
 class DashboardFragment : Fragment() {
@@ -37,82 +28,99 @@ class DashboardFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         dashboardViewModel =
             ViewModelProvider(this).get(DashboardViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
+        var btnAdd: Button = root.findViewById(R.id.btnAdd)
+        var btnMinus: Button = root.findViewById(R.id.btnMinus)
+        var listview: ListView = root.findViewById(R.id.ScrollView)
 
         dashboardViewModel.text.observe(viewLifecycleOwner, Observer {
+            var adaptador: AdapterComando = AdapterComando(context, GlobalData.listaComandos)
+            listview.adapter = adaptador
 
-            val btnGuardar: Button = root.findViewById(R.id.btnComida)
-            val txtIDFood: EditText = root.findViewById(R.id.txtIDFood)
-            val txtAlimento: EditText = root.findViewById(R.id.txtAlimento)
-            val txtProveedor: EditText = root.findViewById(R.id.txtProveedor)
-
-            val btnBuscar: Button = root.findViewById(R.id.btnBuscar)
-            val txtBuscarIDFood: EditText = root.findViewById(R.id.txtBuscarIDFood)
-            val txtBuscarAlimento: EditText = root.findViewById(R.id.txtBuscarAlimento)
-            val txtBuscarProveedor: EditText = root.findViewById(R.id.txtBuscarProveedor)
-
-            btnGuardar.setOnClickListener {
-                var URLAux = URL + "insertar_comida.php"
-                var params = HashMap<String, String>()
-                params["idFood"] = txtIDFood.text.toString()
-                params["proveedor"] = txtProveedor.text.toString()
-                params["alimentoGrPorSegundo"] = txtAlimento.text.toString()
-
-                var request: StringRequest =
-                    object : StringRequest(Request.Method.POST, URLAux, {
-                        Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
-                    }, { error: VolleyError ->
-                        println("Error $error.message")
-                        Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
-                    }) {
-                        override fun getParams(): Map<String, String> {
-                            return params
-                        }
-                    }
-
-                request.retryPolicy =
-                    DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
-
-                queue = Volley.newRequestQueue(context)
-                queue.add(request)
-
+            btnAdd.setOnClickListener {
+                val com: Command = Command(GlobalData.pool)
+                GlobalData.listaComandos.add(com)
+                adaptador = AdapterComando(context, GlobalData.listaComandos)
+                listview.adapter = adaptador
             }
 
-            btnBuscar.setOnClickListener {
-                var URLAux = URL + "buscar_comida.php?idFood=" + txtBuscarIDFood.getText() + ""
-
-                var jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-                    Request.Method.GET,
-                    URLAux,
-                    null,
-
-                    {
-                        var jsonObject: JSONObject? = null
-                        for (i in 0 until it.length()) {
-                            try {
-                                jsonObject = it.getJSONObject(i)
-                                txtBuscarAlimento.setText(jsonObject.getInt("alimentoGrPorSegundo").toString())
-                                txtBuscarProveedor.setText(jsonObject.getString("proveedor"))
-                            } catch (error: JSONException) {
-                                Toast.makeText(context, "No se encuentra el producto", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-
-                    },
-
-                    {
-                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
-                    })
-
-                queue = Volley.newRequestQueue(context)
-                queue.add(jsonArrayRequest)
+            btnMinus.setOnClickListener {
+                GlobalData.listaComandos.removeLast()
+                adaptador = AdapterComando(context, GlobalData.listaComandos)
+                listview.adapter = adaptador
             }
 
         })
         return root
     }
+}
+
+class AdapterComando: BaseAdapter {
+    var command = ArrayList<Command>()
+    var context: Context? = null
+
+    constructor(context: Context?, movies: ArrayList<Command>) : super() {
+        this.command = movies
+        this.context = context
+    }
+
+
+    override fun getCount(): Int {
+        return command.size
+    }
+
+    override fun getItem(position: Int): Any {
+        return command[position]
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    @SuppressLint("SetTextI18n", "ViewHolder", "InflateParams")
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val com = command[position]
+        val inflater = context!!.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val vista = inflater.inflate(R.layout.progamacion_view, null)
+
+        val txtSComando: CheckBox = vista.findViewById(R.id.txtSComando)
+        val txtPorcAlimento: TextView = vista.findViewById(R.id.txtPorcAlimento)
+        val txtHoraInicio: TextView = vista.findViewById(R.id.txtHoraInicio)
+        val txtHoraFinal: TextView = vista.findViewById(R.id.txtHoraFinal)
+        val btnEditar: Button = vista.findViewById(R.id.btnEditar)
+
+        txtSComando.isChecked = com.s != 0
+        txtSComando.text = "S" + (position+1)
+        txtPorcAlimento.text = "" + com.porcentajeAlimento
+        
+        var time = ""
+        if (("" + com.horario_inicial_min.toString()).length == 1){
+            time = "0" + com.horario_inicial_min.toString()
+        }else
+            time = "" + com.horario_inicial_min.toString()
+
+        var time1 = ""
+        if (("" + com.horario_final_min.toString()).length == 1){
+            time1 = "0" + com.horario_final_min.toString()
+        }else
+            time1 = "" + com.horario_final_min.toString()
+
+        txtHoraInicio.text = "" + com.horario_inicial_hr + ":" + time
+        txtHoraFinal.text = "" + com.horario_final_hr + ":" + time1
+
+        btnEditar.setOnClickListener {
+            GlobalData.index = position
+            val frag = EditCommand()
+            val transaction = (context as MainActivity).getSupportFragmentManager().beginTransaction()
+            transaction.replace(R.id.nav_host_fragment, frag)
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
+        return vista
+    }
+
 }

@@ -11,98 +11,167 @@
     android:paddingTop="10dp">
 
     <LinearLayout
-        android:layout_marginTop="32dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="30dp"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/txtIDFood"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:text="BUMPER CROP 2.0"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-        <EditText
-            android:id="@+id/txtProveedor"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:text="vimifos"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-        <EditText
-            android:id="@+id/txtAlimento"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:text="80"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-        <Button
-            android:id="@+id/btnComida"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/circle_red"
-            android:text="@string/btnGuardar"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            style="@style/spinner_style">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
 
-    <LinearLayout
-        android:layout_marginTop="64dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtTipoAlimento"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:textSize="17sp"/>
 
-        <EditText
-            android:id="@+id/txtBuscarIDFood"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:text="BUMPER CROP 2.0"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+                <Spinner
+                    android:id="@+id/selectComida"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    style="@style/spinner_style"
+                    android:textColor="@color/white"/>
 
-        <Button
-            android:id="@+id/btnBuscar"
-            android:layout_width="wrap_content"
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtAlimentoCargado"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:textSize="17sp"/>
+
+                <EditText
+                    android:id="@+id/txtAlimento"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:autofillHints="Max 100"
+                    android:background="@color/white"
+                    android:inputType="number"
+                    tools:ignore="LabelFor" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/circle_red"
-            android:text="Buscar"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/txtAdd"
+                android:textSize="30sp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/white"
+                android:background="@drawable/square"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnMinus"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/txtMinus"
+                android:textSize="30sp"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/white"
+                android:background="@drawable/square"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight=".5"
+                android:layout_height="wrap_content"
+                android:text=""/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:textAlignment="center"
+                android:text="@string/txtPrcAli"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:text="@string/txttHoraI"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="@string/txttHoraF"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight=".8"
+                android:layout_height="wrap_content"
+                android:text=""/>
+        </LinearLayout>
 
 
-        <EditText
-            android:id="@+id/txtBuscarProveedor"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-        <EditText
-            android:id="@+id/txtBuscarAlimento"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-
+        <ListView
+            android:id="@+id/ScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

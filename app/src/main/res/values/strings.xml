@@ -16,6 +16,7 @@
     <string name="btnBuscar">Buscar</string>
     <string name="btnBuscarDevice">Buscar Devices</string>
     <string name="btnActualizar">Actualizar</string>
+    <string name="btnCancelar">Cancelar</string>
 
     <string name="introInicio">HISTORIAL DE BALANCEADO DOSIFICADO</string>
     <string name="seleccioneFecha">SELECCIONE UNA FECHA: </string>
@@ -129,6 +130,14 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="txtTipoAlimento">Tipo de Alimento</string>
+    <string name="txtAlimentoCargado">Alimento Cargado Kg</string>
+    <string name="numExp">1</string>
+    <string name="txtAdd">+</string>
+    <string name="txtMinus">-</string>
+    <string name="btnEditar">Editar</string>
+    <string name="txttHoraF">Hora Fin</string>
+    <string name="txttHoraI">Hora Inicio</string>
+    <string name="txtPrcAli">% alimento</string>
 </resources>

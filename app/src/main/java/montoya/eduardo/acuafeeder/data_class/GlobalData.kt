@@ -15,6 +15,8 @@ open class GlobalData: Application() {
        var fechaTemp: String = ""
        var listaDevices: ArrayList<Devices> = ArrayList()
        var deviceTemp: String = ""
+
+       var index: Int = 0
    }
 
     override fun onCreate() {

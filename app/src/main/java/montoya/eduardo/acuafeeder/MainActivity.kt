@@ -2,6 +2,7 @@ package montoya.eduardo.acuafeeder
 
 import android.os.Bundle
 import android.os.StrictMode
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
@@ -38,5 +39,24 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
 
+    }
+
+    @Override
+    override fun onBackPressed() {
+        val fragmentList: List<*> = supportFragmentManager.fragments
+
+        var handled = false
+        for (f in fragmentList) {
+            if (f is EditCommand) {
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.detach(f)
+                transaction.addToBackStack(null)
+                transaction.commit()
+            }
+        }
+
+        if (!handled) {
+            super.onBackPressed()
+        }
     }
 }

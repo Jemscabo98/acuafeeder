@@ -197,7 +197,6 @@ class InformationFragment : Fragment() {
         return arrayLineaTemp
     }
 
-
     //Obtener datos de BD
     fun obtenerTempBD(){
         val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
