@@ -42,6 +42,8 @@ class InformationFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     val sdf2: SimpleDateFormat = SimpleDateFormat("HH:mm:ss")
     val sdfDay: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+    private lateinit var txtNumPiscina: EditText
+
 
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun onCreateView(
@@ -51,7 +53,7 @@ class InformationFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_informacion, container, false)
         val graph: GraphView = root.findViewById(R.id.graph) as GraphView
-        val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
+        txtNumPiscina = root.findViewById(R.id.txtNumPiscina)
         val btnSelecFecha: Button = root.findViewById(R.id.selFechaTemp)
         val txtSelecFecha: TextView = root.findViewById(R.id.txtFechaTemp)
         val btnActualizarGraph: Button = root.findViewById(R.id.btnActualizarGraph)
@@ -72,6 +74,7 @@ class InformationFragment : Fragment() {
         txtNumPiscina.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE)
 
         //Llena la lista del Spinner
+        obtenerDevicesBD()
         fillSpinner(selectDevice, context)
 
         obtenerTempBD()
@@ -112,6 +115,7 @@ class InformationFragment : Fragment() {
             if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
                 GlobalData.pool = txtNumPiscina.text.toString().toInt()
                 //Llena la lista del Spinner
+                obtenerDevicesBD()
                 fillSpinner(selectDevice, context)
             }else{
                 Toast.makeText(context,
@@ -152,7 +156,7 @@ class InformationFragment : Fragment() {
 
     fun graficarResultados(graph: GraphView){
         val lineaTemp = LineGraphSeries(getDataBD())
-        lineaTemp.color = Color.RED
+        lineaTemp.color = Color.GREEN
         // Limpi la grafica cada vez que se busque datos
         graph.removeAllSeries()
         if (!GlobalData.listaTemp.isEmpty()){
@@ -202,7 +206,6 @@ class InformationFragment : Fragment() {
         val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
                 "&idDevices=" + GlobalData.deviceTemp
 
-        //val URLAux = GlobalData.URL + "buscar_temp.php?date=2021-07-07&idDevices=CZEUYRM9CP6A"
         Log.d(TAG, "URL: $URLAux")
         GlobalData.listaTemp.clear()
         var aux = ""
@@ -275,12 +278,12 @@ class InformationFragment : Fragment() {
             })
 
         queue = Volley.newRequestQueue(context)
+        jsonArrayRequest.setShouldCache(false)
         queue.add(jsonArrayRequest)
     }
 
     fun fillSpinner(selectDevice: Spinner, context: Context?){
         if (context!=null){
-            obtenerDevicesBD();
             handler.postDelayed(Runnable {
                 val listaAux: ArrayList<String> = ArrayList()
                 for (x in GlobalData.listaDevices) {
@@ -295,9 +298,8 @@ class InformationFragment : Fragment() {
                 } catch (e: java.lang.IndexOutOfBoundsException) {
 
                 }
-            }, 45)
+            }, 750)
         }
-
     }
 }
 

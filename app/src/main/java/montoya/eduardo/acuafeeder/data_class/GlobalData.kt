@@ -8,6 +8,7 @@ import kotlin.collections.ArrayList
 open class GlobalData: Application() {
    companion object{
        val URL: String = "https://bytefruit.com/practicas-acuafeeder/php/"
+       //val URL = "http://192.168.1.111:8080/acuafeeder/"
        var pool: Int = 0
        var listaComandos: ArrayList<Command> = ArrayList()
 

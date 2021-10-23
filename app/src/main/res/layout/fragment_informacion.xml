@@ -141,7 +141,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:background="@drawable/square"
-                android:backgroundTint="@color/red"
+                android:backgroundTint="@color/green"
                 android:orientation="vertical"/>
 
             <TextView

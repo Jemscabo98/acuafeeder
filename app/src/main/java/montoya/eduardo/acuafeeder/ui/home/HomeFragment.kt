@@ -46,19 +46,19 @@ class HomeFragment : Fragment() {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
             val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
             val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
-            GlobalData.listaComandos = ArrayList()
 
             txtNumPiscina.setText(GlobalData.pool.toString())
 
             if (GlobalData.listaComandos.isEmpty()){
+                GlobalData.listaComandos = ArrayList()
                 //Obtiene los datos de la BD
                 obtenerDatosBD()
 
                 handler.postDelayed(Runnable {
                     cargarDatos(graph)
-                },25)
+                },500)
             }
-            if (!GlobalData.listaComandos.isEmpty()){
+            if (GlobalData.listaComandos.isNotEmpty()){
                 cargarDatos(graph)
             }
 
@@ -74,7 +74,7 @@ class HomeFragment : Fragment() {
 
                     handler.postDelayed(Runnable {
                         cargarDatos(graph)
-                     },25)
+                     },500)
                 } else {
                     Toast.makeText(context,
                         "Favor de solo usar números en piscina",
@@ -133,6 +133,7 @@ class HomeFragment : Fragment() {
             })
 
         queue = Volley.newRequestQueue(context)
+        jsonArrayRequest.setShouldCache(false)
         queue.add(jsonArrayRequest)
     }
 
