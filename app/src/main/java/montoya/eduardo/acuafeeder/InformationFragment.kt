@@ -60,6 +60,7 @@ class InformationFragment : Fragment() {
         val selectDevice: Spinner = root.findViewById(R.id.selectDevice)
         val btnBuscarDispositivos: Button = root.findViewById(R.id.btnBuscarDispositivos)
 
+        //Pone el dia actual como fecha automatica
         if (GlobalData.fechaTemp==""){
             val cal: Calendar = Calendar.getInstance() //Objeto Calendario
             GlobalData.fechaTemp = cal.get(Calendar.YEAR).toString() +
@@ -73,9 +74,19 @@ class InformationFragment : Fragment() {
         //Carga el numero de piscina global
         txtNumPiscina.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE)
 
-        //Llena la lista del Spinner
-        obtenerDevicesBD()
-        fillSpinner(selectDevice, context)
+        //Llena los datos al select box
+        if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool){
+            GlobalData.listaDevices = ArrayList()
+
+            //Llena la lista del Spinner
+            obtenerDevicesBD()
+
+            handler.postDelayed(Runnable {
+                fillSpinner(selectDevice, context)
+            }, 750)
+        }else{
+            fillSpinner(selectDevice, context)
+        }
 
         obtenerTempBD()
 
@@ -114,9 +125,16 @@ class InformationFragment : Fragment() {
         btnBuscarDispositivos.setOnClickListener {
             if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
                 GlobalData.pool = txtNumPiscina.text.toString().toInt()
-                //Llena la lista del Spinner
+                /*//Llena la lista del Spinner
                 obtenerDevicesBD()
-                fillSpinner(selectDevice, context)
+                fillSpinner(selectDevice, context)*/
+                    //Llena la lista del Spinner
+
+                obtenerDevicesBD()
+                handler.postDelayed(Runnable {
+                    fillSpinner(selectDevice, context)
+                }, 750)
+
             }else{
                 Toast.makeText(context,
                     "Favor de solo usar números en piscina",
@@ -259,7 +277,7 @@ class InformationFragment : Fragment() {
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"))
+                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
                         device.idDevices = jsonObject.getString("idDevice")
                         device.userID = jsonObject.getInt("devices_user_id")
 
@@ -284,7 +302,6 @@ class InformationFragment : Fragment() {
 
     fun fillSpinner(selectDevice: Spinner, context: Context?){
         if (context!=null){
-            handler.postDelayed(Runnable {
                 val listaAux: ArrayList<String> = ArrayList()
                 for (x in GlobalData.listaDevices) {
                     listaAux.add(x.devices_etiqueta)
@@ -298,7 +315,6 @@ class InformationFragment : Fragment() {
                 } catch (e: java.lang.IndexOutOfBoundsException) {
 
                 }
-            }, 750)
         }
     }
 }

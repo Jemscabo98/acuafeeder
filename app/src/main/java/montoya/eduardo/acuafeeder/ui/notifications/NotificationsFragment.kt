@@ -14,6 +14,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.Devices
+import montoya.eduardo.acuafeeder.data_class.GlobalData
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -61,7 +62,7 @@ class NotificationsFragment : Fragment() {
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        var dispo: Devices = Devices(jsonObject.getString("devices_etiqueta"))
+                        var dispo: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
                         dispo.idDevices = jsonObject.getString("idDevice")
                         dispo.userID = jsonObject.getString("devices_user_id").toInt()
 

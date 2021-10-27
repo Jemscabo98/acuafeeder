@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +54,7 @@ class EditCommand : Fragment() {
 
         var com = GlobalData.listaComandos.get(GlobalData.index)
         txtSComando.text = "S" + (GlobalData.index + 1)
-        txtSComando.isChecked = com.s != 0
+        txtSComando.isChecked = com.s == 1
         txtPorcAlimento.text = com.porcentajeAlimento.toString()
 
         if (GlobalData.listaDevices.isEmpty())
@@ -79,13 +80,21 @@ class EditCommand : Fragment() {
         }
 
         btnGuardar.setOnClickListener {
-            verificarDatos(com)
-            GlobalData.listaComandos[GlobalData.index] = com
-            val aux = GlobalData.index+1
-            for (n in GlobalData.listaDevices) {
-                updateCommand(n.idDevices, aux.toString(), com)
+            if(verificarDatos(com)){
+                val aux = GlobalData.index+1
+
+                if (txtSComando.isChecked)
+                    GlobalData.listaComandos.get(GlobalData.index).s = 1
+                else
+                    GlobalData.listaComandos.get(GlobalData.index).s = 0
+
+
+                for (n in GlobalData.listaDevices) {
+                    updateCommand(n.idDevices, aux.toString(), com)
+                }
+
+                salirFragmento()
             }
-            salirFragmento()
         }
 
         return root
@@ -130,27 +139,100 @@ class EditCommand : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    fun verificarDatos(com: Command): Boolean{
-        if (!txtPorcAlimento.text.isDigitsOnly() || txtPorcAlimento.text.isEmpty()){
-            Toast.makeText(context, "Solo numeros enteros en porcentaje", Toast.LENGTH_SHORT).show()
+    fun verificarDatos(com: Command): Boolean {
+        val comAux: Command = Command(com.pool)
+        if (!txtPorcAlimento.text.isDigitsOnly() || txtPorcAlimento.text.isEmpty()) {
+            mostrarMensaje("Solo numeros enteros en porcentaje")
             return false
         }
 
         val regex: Regex = """([01]?[0-9]|2[0-3]):[0-5][0-9]""".toRegex()
-        if (!regex.matches(txtHoraInicio.text) || !regex.matches(txtHoraFinal.text)){
-            Toast.makeText(context, "Error en sintaxis de fechas", Toast.LENGTH_SHORT).show()
+        if (!regex.matches(txtHoraInicio.text) || !regex.matches(txtHoraFinal.text)) {
+            mostrarMensaje( "Error en sintaxis de fechas")
             return false
         }
 
         val splitInit = txtHoraInicio.text.split(":").toTypedArray()
-        com.horario_inicial_hr = splitInit[0].toInt()
-        com.horario_inicial_min = splitInit[1].toInt()
+        comAux.horario_inicial_hr = splitInit[0].toInt()
+        comAux.horario_inicial_min = splitInit[1].toInt()
         val splitEnd = txtHoraFinal.text.split(":").toTypedArray()
-        com.horario_final_hr = splitEnd[0].toInt()
-        com.horario_final_min = splitEnd[1].toInt()
-        com.porcentajeAlimento = Integer.parseInt(txtPorcAlimento.text.toString())
+        comAux.horario_final_hr = splitEnd[0].toInt()
+        comAux.horario_final_min = splitEnd[1].toInt()
+        comAux.porcentajeAlimento = Integer.parseInt(txtPorcAlimento.text.toString())
 
+        if (comAux.horario_final_hr < comAux.horario_inicial_hr){
+            mostrarMensaje("La fecha Inicial no puede ser mayor que la fecha final")
+            return false
+        }
+
+        if (comAux.horario_final_hr == comAux.horario_inicial_hr && comAux.horario_final_min <= comAux.horario_inicial_min){
+            mostrarMensaje("La fecha Inicial no puede ser igual o mayor que la fecha final")
+            return false
+        }
+
+        if (GlobalData.index == 0 && GlobalData.listaComandos.size >= 2){
+            if (comAux.horario_final_hr == GlobalData.listaComandos[1].horario_inicial_hr ){
+                if (comAux.horario_final_min >= GlobalData.listaComandos[1].horario_inicial_min){
+                    mostrarMensaje("La fecha final no puede ser igual o mayor a " + GlobalData.listaComandos[1].horario_inicial_hr.toString() + ":" + GlobalData.listaComandos[1].horario_inicial_min.toString())
+                    return false
+                }
+            }
+            else if (comAux.horario_final_hr >= GlobalData.listaComandos[1].horario_inicial_hr ){
+                mostrarMensaje("La fecha final no puede ser mayor a " + GlobalData.listaComandos[1].horario_inicial_hr.toString() + ":" + GlobalData.listaComandos[1].horario_inicial_min.toString())
+                return false
+            }
+        }
+
+        else if (GlobalData.index == GlobalData.listaComandos.size-1){
+            if (comAux.horario_inicial_hr == GlobalData.listaComandos[GlobalData.index-1].horario_final_hr ){
+                if (comAux.horario_inicial_min <= GlobalData.listaComandos[GlobalData.index-1].horario_final_min){
+                    mostrarMensaje("La fecha inicial no puede ser igual o menor a " + GlobalData.listaComandos[GlobalData.index-1].horario_final_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index-1].horario_final_min.toString())
+                    return false
+                }
+            }
+            else if (comAux.horario_inicial_hr <= GlobalData.listaComandos[GlobalData.index-1].horario_final_hr ){
+                mostrarMensaje("La fecha inicial no puede ser menor a " + GlobalData.listaComandos[GlobalData.index-1].horario_final_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index-1].horario_final_min.toString())
+                return false
+            }
+        }
+
+        else if (GlobalData.index > 0 ||GlobalData.index < GlobalData.listaComandos.size-1){
+            if (comAux.horario_inicial_hr == GlobalData.listaComandos[GlobalData.index-1].horario_final_hr ){
+                if (comAux.horario_inicial_min <= GlobalData.listaComandos[GlobalData.index-1].horario_final_min){
+                    mostrarMensaje("La fecha inicial no puede ser igual o menor a " + GlobalData.listaComandos[GlobalData.index-1].horario_final_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index-1].horario_final_min.toString())
+                    return false
+                }
+            }
+            else if (comAux.horario_inicial_hr <= GlobalData.listaComandos[GlobalData.index-1].horario_final_hr ){
+                mostrarMensaje("La fecha inicial no puede ser menor a " + GlobalData.listaComandos[GlobalData.index-1].horario_final_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index-1].horario_final_min.toString())
+                return false
+            }
+
+            if (comAux.horario_final_hr == GlobalData.listaComandos[GlobalData.index+1].horario_inicial_hr ){
+                if (comAux.horario_final_min >= GlobalData.listaComandos[GlobalData.index+1].horario_inicial_min){
+                    mostrarMensaje("La fecha final no puede ser igual o mayor a " + GlobalData.listaComandos[GlobalData.index+1].horario_inicial_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index+1].horario_inicial_min.toString())
+                    return false
+                }
+            }
+            else if (comAux.horario_final_hr >= GlobalData.listaComandos[GlobalData.index+1].horario_inicial_hr ){
+                mostrarMensaje("La fecha final no puede ser mayor a " + GlobalData.listaComandos[GlobalData.index+1].horario_inicial_hr.toString() + ":" + GlobalData.listaComandos[GlobalData.index+1].horario_inicial_min.toString())
+                return false
+            }
+        }
+
+        com.horario_inicial_hr = comAux.horario_inicial_hr
+        com.horario_inicial_min = comAux.horario_inicial_min
+        com.horario_final_hr = comAux.horario_final_hr
+        com.horario_final_min = comAux.horario_final_min
+        com.porcentajeAlimento = comAux.porcentajeAlimento
+        GlobalData.listaComandos[GlobalData.index] = com
         return true
+    }
+
+    fun mostrarMensaje(msg: String){
+        val toast = Toast.makeText(context, msg, Toast.LENGTH_LONG)
+        toast.setGravity(Gravity.CENTER, 0, 0)
+        toast.show()
     }
 
     fun salirFragmento(){
@@ -175,14 +257,14 @@ class EditCommand : Fragment() {
                 for (i in 0 until it.length()) {
                     try {
                         jsonObject = it.getJSONObject(i)
-                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"))
+                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
                         device.idDevices = jsonObject.getString("idDevice")
                         device.userID = jsonObject.getInt("devices_user_id")
 
                         GlobalData.listaDevices.add(device)
 
                     } catch (error: JSONException) {
-                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
+                        mostrarMensaje( "Problemas de conexión")
                     }
                 }
             },
