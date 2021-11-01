@@ -17,6 +17,9 @@
     <string name="btnBuscarDevice">Buscar Devices</string>
     <string name="btnActualizar">Actualizar</string>
     <string name="btnCancelar">Cancelar</string>
+    <string name="btnMostrar">Mostrar</string>
+    <string name="btnRegistrar">Registrar</string>
+    <string name="btnEliminar">Eliminar</string>
 
     <string name="introInicio">HISTORIAL DE BALANCEADO DOSIFICADO</string>
     <string name="seleccioneFecha">SELECCIONE UNA FECHA: </string>
@@ -140,4 +143,8 @@
     <string name="txttHoraF">Hora Fin</string>
     <string name="txttHoraI">Hora Inicio</string>
     <string name="txtPrcAli">% alimento</string>
+    <string name="txtFecha">Fecha</string>
+    <string name="txtpiscina">Piscina</string>
+    <string name="txtEtiqueta">Etiqueta</string>
+    <string name="txtSN">SN</string>
 </resources>

@@ -416,7 +416,7 @@ class AdapterComando: BaseAdapter {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val com = command[position]
         val inflater = context!!.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val vista = inflater.inflate(R.layout.progamacion_view, null)
+        val vista = inflater.inflate(R.layout.programacion_view, null)
 
         val txtSComando: CheckBox = vista.findViewById(R.id.txtSComando)
         val txtPorcAlimento: TextView = vista.findViewById(R.id.txtPorcAlimento)

@@ -10,11 +10,125 @@
     android:paddingTop="10dp">
 
     <LinearLayout
-        android:layout_width="360dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="60dp"
-        android:layout_gravity="center">
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="60dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnOcultar"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/btnRegistrar"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
+
+            <Button
+                android:id="@+id/btnMos"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/btnMostrar"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLay2"
+            android:layout_width="match_parent"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:background="@drawable/square"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+            <EditText
+                android:id="@+id/txtEtiqueta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:hint="@string/txtEtiqueta"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:textColorHint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:background="@color/white"
+                android:autofillHints=""
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/txtPiscina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:hint="@string/txtpiscina"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:textColorHint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:background="@color/white"
+                android:autofillHints=""
+                android:inputType="number"
+                android:enabled="false"/>
+
+            <EditText
+                android:id="@+id/txtSN"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:hint="@string/txtSN"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:textColorHint="@color/gray"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:background="@color/white"
+                android:autofillHints=""
+                android:inputType="text"/>
+
+            <Button
+                android:id="@+id/txtGuardarDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/btnGuardar"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLay"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:orientation="vertical"
+            >
+
+            <ListView
+                android:id="@+id/listViewDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
+
+
+
+
+
 
     </LinearLayout>
 

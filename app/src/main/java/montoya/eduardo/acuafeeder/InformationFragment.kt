@@ -30,6 +30,7 @@ import montoya.eduardo.acuafeeder.data_class.temp
 import org.json.JSONException
 import org.json.JSONObject
 import java.sql.Time
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -280,6 +281,7 @@ class InformationFragment : Fragment() {
                         val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
                         device.idDevices = jsonObject.getString("idDevice")
                         device.userID = jsonObject.getInt("devices_user_id")
+                        device.fechaCreacion = Timestamp.valueOf(jsonObject.getString("devices_date"))
 
                         GlobalData.listaDevices.add(device)
 
