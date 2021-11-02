@@ -27,8 +27,6 @@ import org.json.JSONObject
 
 
 class DashboardFragment : Fragment() {
-    //val URL = "http://practicaspro.webhop.me:8080/acuafeeder/"
-    val URL = "https://bytefruit.com/practicas-acuafeeder/php/"
     private lateinit var dashboardViewModel: DashboardViewModel
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
