@@ -30,6 +30,10 @@
     <string name="alertaTempMin">TEMPERATURA MAXIMA</string>
     <string name="btnGuardar">GUARDAR</string>
 
+    <string name="prompt_email">ejemplo@gmail.com</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="action_sign_in">Siguiente</string>
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

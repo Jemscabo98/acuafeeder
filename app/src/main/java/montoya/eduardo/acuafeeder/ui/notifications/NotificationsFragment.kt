@@ -40,6 +40,8 @@ class NotificationsFragment : Fragment() {
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var disp: Devices
+    private lateinit var listaDevices: ArrayList<Devices>
+    private var otraAlberca: Boolean = false
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -59,10 +61,13 @@ class NotificationsFragment : Fragment() {
             val txtPiscina: EditText = root.findViewById(R.id.txtPiscina)
             val txtSN: EditText = root.findViewById(R.id.txtSN)
             val txtGuardarDevice: Button = root.findViewById(R.id.txtGuardarDevice)
-
-            var adaptador: AdapterDevice = AdapterDevice(context, GlobalData.listaDevices)
+            listaDevices = ArrayList()
+            listaDevices.clear()
+            listview.adapter = null
+            var adaptador: AdapterDevice = AdapterDevice(context, listaDevices)
+            adaptador.notifyDataSetChanged()
             disp = Devices("",GlobalData.pool)
-            txtPiscina.setText("Piscina: " + GlobalData.pool.toString())
+            txtPiscina.setText(GlobalData.pool.toString())
 
             if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool) {
                 GlobalData.listaDevices = ArrayList()
@@ -72,30 +77,47 @@ class NotificationsFragment : Fragment() {
 
             btnOcultar.setOnClickListener {
                 layout2.layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
-                GlobalData.listaDevices.clear()
-                adaptador = AdapterDevice(context, GlobalData.listaDevices)
+                listaDevices.clear()
                 adaptador.notifyDataSetChanged()
-                listview.adapter = adaptador
+                adaptador = AdapterDevice(context, listaDevices)
+                adaptador.notifyDataSetChanged()
+                listview.adapter = null
                 obtenerDevicesBD()
             }
 
             btnM.setOnClickListener {
+                listaDevices = GlobalData.listaDevices
                 layout2.layoutParams.height = 0
-                adaptador = AdapterDevice(context, GlobalData.listaDevices)
+                adaptador = AdapterDevice(context, listaDevices)
                 adaptador.notifyDataSetChanged()
                 listview.adapter = adaptador
             }
 
             txtGuardarDevice.setOnClickListener {
                 if (verificarDatos(txtEtiqueta, txtPiscina, txtSN)){
-                    agregarDevicesBD(disp)
-                    GlobalData.listaDevices.add(disp)
-                    txtEtiqueta.setText ("")
-                    txtSN.setText ("")
-                    layout2.layoutParams.height = 0
-                    adaptador = AdapterDevice(context, GlobalData.listaDevices)
-                    adaptador.notifyDataSetChanged()
-                    listview.adapter = adaptador
+                    if (otraAlberca){
+                        handler.postDelayed(Runnable {
+                            agregarDevicesBD(disp)
+                            GlobalData.listaDevices.add(disp)
+                            listaDevices = GlobalData.listaDevices
+                            txtEtiqueta.setText ("")
+                            txtSN.setText ("")
+                            layout2.layoutParams.height = 0
+                            adaptador = AdapterDevice(context, listaDevices)
+                            adaptador.notifyDataSetChanged()
+                            listview.adapter = adaptador
+                        }, 650)
+                    }else{
+                        agregarDevicesBD(disp)
+                        GlobalData.listaDevices.add(disp)
+                        listaDevices = GlobalData.listaDevices
+                        txtEtiqueta.setText ("")
+                        txtSN.setText ("")
+                        layout2.layoutParams.height = 0
+                        adaptador = AdapterDevice(context, listaDevices)
+                        adaptador.notifyDataSetChanged()
+                        listview.adapter = adaptador
+                    }
                 }
             }
 
@@ -112,7 +134,17 @@ class NotificationsFragment : Fragment() {
         disp.fechaCreacion = Timestamp(System.currentTimeMillis())
         disp.userID = GlobalData.idUser
         disp.devices_etiqueta = txtEtiqueta.text.toString()
-        disp.pool = GlobalData.pool
+
+        if(GlobalData.pool != txtPiscina.text.toString().toInt()){
+            GlobalData.pool = txtPiscina.text.toString().toInt()
+            disp.pool = GlobalData.pool
+            obtenerDevicesBD()
+            otraAlberca = true
+        }
+        else {
+            disp.pool = GlobalData.pool
+            otraAlberca = false
+        }
         return true
     }
     
