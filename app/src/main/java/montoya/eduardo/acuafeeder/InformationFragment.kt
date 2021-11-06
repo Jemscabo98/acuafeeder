@@ -26,6 +26,8 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerTempBD
 import montoya.eduardo.acuafeeder.data_class.temp
 import org.json.JSONException
 import org.json.JSONObject
@@ -80,7 +82,7 @@ class InformationFragment : Fragment() {
             GlobalData.listaDevices = ArrayList()
 
             //Llena la lista del Spinner
-            obtenerDevicesBD()
+            obtenerDevicesBD(requireContext())
 
             handler.postDelayed(Runnable {
                 fillSpinner(selectDevice, context)
@@ -89,7 +91,7 @@ class InformationFragment : Fragment() {
             fillSpinner(selectDevice, context)
         }
 
-        obtenerTempBD()
+        obtenerTempBD(requireContext())
 
         handler.postDelayed(Runnable {
             graficarResultados(graph)
@@ -126,12 +128,8 @@ class InformationFragment : Fragment() {
         btnBuscarDispositivos.setOnClickListener {
             if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
                 GlobalData.pool = txtNumPiscina.text.toString().toInt()
-                /*//Llena la lista del Spinner
-                obtenerDevicesBD()
-                fillSpinner(selectDevice, context)*/
-                    //Llena la lista del Spinner
 
-                obtenerDevicesBD()
+                obtenerDevicesBD(requireContext())
                 handler.postDelayed(Runnable {
                     fillSpinner(selectDevice, context)
                 }, 750)
@@ -164,7 +162,7 @@ class InformationFragment : Fragment() {
         }
 
         btnActualizarGraph.setOnClickListener {
-            obtenerTempBD()
+            obtenerTempBD(requireContext())
 
             handler.postDelayed(Runnable {
                 graficarResultados(graph)
@@ -218,88 +216,6 @@ class InformationFragment : Fragment() {
         val arrayLineaTemp = arrayListLineaTemp.toTypedArray()
 
         return arrayLineaTemp
-    }
-
-    //Obtener datos de BD
-    fun obtenerTempBD(){
-        val URLAux = GlobalData.URL + "buscar_temp.php?date=" + GlobalData.fechaTemp +
-                "&idDevices=" + GlobalData.deviceTemp
-
-        Log.d(TAG, "URL: $URLAux")
-        GlobalData.listaTemp.clear()
-        var aux = ""
-
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET,
-            URLAux,
-            null,
-
-            {
-                var jsonObject: JSONObject? = null
-                for (i in 0 until it.length()) {
-                    try {
-                        jsonObject = it.getJSONObject(i)
-                        val tmp = temp(jsonObject.getString("time"))
-                        tmp.temp = jsonObject.getString("tempAgua")
-                        if (tmp.time.equals(aux)) {
-                        } else {
-                            aux = tmp.time
-                            GlobalData.listaTemp.add(tmp)
-                        }
-
-                    } catch (error: JSONException) {
-                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-            },
-
-            {
-                Toast.makeText(context,
-                    "No se encuentran datos con los datos ingresados ",
-                    Toast.LENGTH_LONG).show()
-            })
-
-        queue = Volley.newRequestQueue(context)
-        queue.add(jsonArrayRequest)
-    }
-
-    fun obtenerDevicesBD(){
-        val URLAux = GlobalData.URL + "buscar_dispositivos.php?devices_piscina=" + GlobalData.pool
-        GlobalData.listaDevices.clear()
-
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET,
-            URLAux,
-            null,
-
-            {
-                var jsonObject: JSONObject? = null
-                for (i in 0 until it.length()) {
-                    try {
-                        jsonObject = it.getJSONObject(i)
-                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
-                        device.idDevices = jsonObject.getString("idDevice")
-                        device.userID = jsonObject.getInt("devices_user_id")
-                        device.fechaCreacion = Timestamp.valueOf(jsonObject.getString("devices_date"))
-
-                        GlobalData.listaDevices.add(device)
-
-                    } catch (error: JSONException) {
-                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-
-            {
-                Toast.makeText(context,
-                    "No se encuentran datos en esta piscina",
-                    Toast.LENGTH_LONG).show()
-            })
-
-        queue = Volley.newRequestQueue(context)
-        jsonArrayRequest.setShouldCache(false)
-        queue.add(jsonArrayRequest)
     }
 
     fun fillSpinner(selectDevice: Spinner, context: Context?){

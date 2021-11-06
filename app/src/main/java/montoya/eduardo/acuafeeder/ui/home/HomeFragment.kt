@@ -1,6 +1,5 @@
 package montoya.eduardo.acuafeeder.ui.home
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.*
 import android.text.TextUtils
@@ -13,20 +12,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
 import montoya.eduardo.acuafeeder.R
-import montoya.eduardo.acuafeeder.data_class.Command
 import montoya.eduardo.acuafeeder.data_class.GlobalData
-import org.json.JSONException
-import org.json.JSONObject
-import java.text.SimpleDateFormat
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
 
 
 class HomeFragment : Fragment() {
@@ -47,12 +40,13 @@ class HomeFragment : Fragment() {
             val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
             val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
 
+            //GlobalData.listaComandos.clear()
             txtNumPiscina.setText(GlobalData.pool.toString())
 
             if (GlobalData.listaComandos.isEmpty()){
                 GlobalData.listaComandos = ArrayList()
                 //Obtiene los datos de la BD
-                obtenerDatosBD()
+                obtenerComandos(requireContext())
 
                 handler.postDelayed(Runnable {
                     cargarDatos(graph)
@@ -70,7 +64,7 @@ class HomeFragment : Fragment() {
                     GlobalData.pool = txtNumPiscina.text.toString().toInt()
 
                     //Obtiene los datos de la BD
-                    obtenerDatosBD()
+                    obtenerComandos(requireContext())
 
                     handler.postDelayed(Runnable {
                         cargarDatos(graph)
@@ -93,48 +87,6 @@ class HomeFragment : Fragment() {
         respuesta = TextUtils.isDigitsOnly(texto)
 
         return respuesta
-    }
-
-    //Obtener datos de BD
-    fun obtenerDatosBD(){
-        val URLAux = GlobalData.URL + "buscar_commandoXalberca.php?piscina=" + GlobalData.pool + ""
-        GlobalData.listaComandos.clear()
-
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET,
-            URLAux,
-            null,
-
-            {
-                var jsonObject: JSONObject? = null
-                for (i in 0 until it.length()) {
-                    try {
-                        jsonObject = it.getJSONObject(i)
-                        val command = Command(GlobalData.pool)
-                        command.horario_inicial_hr = jsonObject.getInt("horario_inicial_hr")
-                        command.horario_inicial_min = jsonObject.getInt("horario_inicial_min")
-                        command.horario_final_hr = jsonObject.getInt("horario_final_hr")
-                        command.horario_final_min = jsonObject.getInt("horario_final_min")
-                        command.porcentajeAlimento = jsonObject.getInt("porcentajeAlimento")
-                        command.s = jsonObject.getInt("s")
-
-                        GlobalData.listaComandos.add(command)
-
-                    } catch (error: JSONException) {
-                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-
-            {
-                Toast.makeText(context,
-                    "No se encuentran datos con este num. de piscina",
-                    Toast.LENGTH_LONG).show()
-            })
-
-        queue = Volley.newRequestQueue(context)
-        jsonArrayRequest.setShouldCache(false)
-        queue.add(jsonArrayRequest)
     }
 
     fun cargarDatos(graph: GraphView){

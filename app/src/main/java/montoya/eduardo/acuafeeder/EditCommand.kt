@@ -1,5 +1,6 @@
 package montoya.eduardo.acuafeeder
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -25,6 +26,8 @@ import com.android.volley.toolbox.Volley
 import montoya.eduardo.acuafeeder.data_class.Command
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateCommand
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -38,6 +41,7 @@ class EditCommand : Fragment() {
     private lateinit var btnCancelar: Button
     private lateinit var btnGuardar: Button
 
+    @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,13 +56,13 @@ class EditCommand : Fragment() {
         btnCancelar = root.findViewById(R.id.btnCancelar)
         btnGuardar = root.findViewById(R.id.btnGuardar)
 
-        var com = GlobalData.listaComandos.get(GlobalData.index)
+        val com = GlobalData.listaComandos.get(GlobalData.index)
         txtSComando.text = "S" + (GlobalData.index + 1)
         txtSComando.isChecked = com.s == 1
         txtPorcAlimento.text = com.porcentajeAlimento.toString()
 
         if (GlobalData.listaDevices.isEmpty())
-            obtenerDevicesBD()
+            obtenerDevicesBD(requireContext())
 
         var time = ""
         if (("" + com.horario_inicial_min.toString()).length == 1) {
@@ -90,7 +94,7 @@ class EditCommand : Fragment() {
 
 
                 for (n in GlobalData.listaDevices) {
-                    updateCommand(n.idDevices, aux.toString(), com)
+                    updateCommand(n.idDevices, aux.toString(), GlobalData.listaComandos.get(GlobalData.index), requireContext())
                 }
 
                 salirFragmento()
@@ -98,44 +102,6 @@ class EditCommand : Fragment() {
         }
 
         return root
-    }
-
-    fun updateCommand(idDevice: String, ID: String, com: Command){
-        val URLAux = GlobalData.URL + "actualizar_comando.php"
-        val params = HashMap<String, String>()
-        params["idDevice"] = idDevice
-        params["ID"] = ID
-
-        if (txtSComando.isChecked)
-            params["s"] = "1"
-        else
-            params["s"] = "0"
-
-        params["etapa"] = "0"
-        params["horario_inicial_hr"] = com.horario_inicial_hr.toString()
-        params["horario_inicial_min"] = com.horario_inicial_min.toString()
-        params["horario_final_hr"] = com.horario_final_hr.toString()
-        params["horario_final_min"] = com.horario_final_min.toString()
-        params["porcentajeAlimento"] = com.porcentajeAlimento.toString()
-
-        val request: StringRequest =
-            object : StringRequest(Request.Method.POST, URLAux, {
-                //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
-            }, { error: VolleyError ->
-                println("Error $error.message")
-                 //Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
-            }) {
-                override fun getParams(): Map<String, String> {
-                    return params
-                }
-            }
-
-        request.retryPolicy =
-            DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
-
-        queue = Volley.newRequestQueue(context)
-        request.setShouldCache(false)
-        queue.add(request)
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -241,38 +207,6 @@ class EditCommand : Fragment() {
         transaction.detach(this)
         transaction.addToBackStack(null)
         transaction.commit()
-    }
-
-    fun obtenerDevicesBD(){
-        val URLAux = GlobalData.URL + "buscar_dispositivos.php?devices_piscina=" + GlobalData.pool
-        GlobalData.listaDevices.clear()
-
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET,
-            URLAux,
-            null,
-
-            {
-                var jsonObject: JSONObject? = null
-                for (i in 0 until it.length()) {
-                    try {
-                        jsonObject = it.getJSONObject(i)
-                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
-                        device.idDevices = jsonObject.getString("idDevice")
-                        device.userID = jsonObject.getInt("devices_user_id")
-
-                        GlobalData.listaDevices.add(device)
-
-                    } catch (error: JSONException) {
-                        mostrarMensaje( "Problemas de conexión")
-                    }
-                }
-            },
-
-            { })
-
-        queue = Volley.newRequestQueue(context)
-        queue.add(jsonArrayRequest)
     }
 
 }

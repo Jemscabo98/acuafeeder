@@ -26,6 +26,8 @@ import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.Command
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.agregarDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.ui.dashboard.AdapterComando
 import org.json.JSONException
 import org.json.JSONObject
@@ -37,7 +39,6 @@ class NotificationsFragment : Fragment() {
 
     private lateinit var notificationsViewModel: NotificationsViewModel
     private lateinit var listaDispositivos: ArrayList<Devices>
-    private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var disp: Devices
     private lateinit var listaDevices: ArrayList<Devices>
@@ -72,7 +73,7 @@ class NotificationsFragment : Fragment() {
             if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool) {
                 GlobalData.listaDevices = ArrayList()
                 //Llena la lista del Spinner
-                obtenerDevicesBD()
+                obtenerDevicesBD(requireContext())
             }
 
             btnOcultar.setOnClickListener {
@@ -82,7 +83,7 @@ class NotificationsFragment : Fragment() {
                 adaptador = AdapterDevice(context, listaDevices)
                 adaptador.notifyDataSetChanged()
                 listview.adapter = null
-                obtenerDevicesBD()
+                obtenerDevicesBD(requireContext())
             }
 
             btnM.setOnClickListener {
@@ -97,7 +98,7 @@ class NotificationsFragment : Fragment() {
                 if (verificarDatos(txtEtiqueta, txtPiscina, txtSN)){
                     if (otraAlberca){
                         handler.postDelayed(Runnable {
-                            agregarDevicesBD(disp)
+                            agregarDevicesBD(disp, requireContext())
                             GlobalData.listaDevices.add(disp)
                             listaDevices = GlobalData.listaDevices
                             txtEtiqueta.setText ("")
@@ -108,7 +109,7 @@ class NotificationsFragment : Fragment() {
                             listview.adapter = adaptador
                         }, 650)
                     }else{
-                        agregarDevicesBD(disp)
+                        agregarDevicesBD(disp, requireContext())
                         GlobalData.listaDevices.add(disp)
                         listaDevices = GlobalData.listaDevices
                         txtEtiqueta.setText ("")
@@ -138,7 +139,7 @@ class NotificationsFragment : Fragment() {
         if(GlobalData.pool != txtPiscina.text.toString().toInt()){
             GlobalData.pool = txtPiscina.text.toString().toInt()
             disp.pool = GlobalData.pool
-            obtenerDevicesBD()
+            GlobalData.obtenerDevicesBD(requireContext())
             otraAlberca = true
         }
         else {
@@ -148,72 +149,7 @@ class NotificationsFragment : Fragment() {
         return true
     }
     
-    fun obtenerDevicesBD(){
-        val URLAux = GlobalData.URL + "buscar_dispositivos.php?devices_piscina=" + GlobalData.pool
-        GlobalData.listaDevices.clear()
 
-        val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET,
-            URLAux,
-            null,
-
-            {
-                var jsonObject: JSONObject? = null
-                for (i in 0 until it.length()) {
-                    try {
-                        jsonObject = it.getJSONObject(i)
-                        val device: Devices = Devices(jsonObject.getString("devices_etiqueta"), GlobalData.pool)
-                        device.idDevices = jsonObject.getString("idDevice")
-                        device.userID = jsonObject.getInt("devices_user_id")
-                        device.fechaCreacion = Timestamp.valueOf(jsonObject.getString("devices_date"))
-
-                        GlobalData.listaDevices.add(device)
-
-                    } catch (error: JSONException) {
-                        Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-
-            {
-                Toast.makeText(context,
-                    "No se encuentran datos en esta piscina",
-                    Toast.LENGTH_LONG).show()
-            })
-
-        queue = Volley.newRequestQueue(context)
-        jsonArrayRequest.setShouldCache(false)
-        queue.add(jsonArrayRequest)
-    }
-
-    fun agregarDevicesBD(dev: Devices){
-        val URLAux = GlobalData.URL + "insertar_devices.php"
-        val params = HashMap<String, String>()
-        params["idDevice"] = dev.idDevices
-        params["devices_date"] = dev.fechaCreacion.toString()
-        params["devices_etiqueta"] = dev.devices_etiqueta
-        params["devices_piscina"] = GlobalData.pool.toString()
-        params["devices_user_id"] = GlobalData.idUser.toString()
-
-        val request: StringRequest =
-            object : StringRequest(Request.Method.POST, URLAux, {
-                //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
-            }, { error: VolleyError ->
-                println("Error $error.message")
-                Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
-            }) {
-                override fun getParams(): Map<String, String> {
-                    return params
-                }
-            }
-
-        request.retryPolicy =
-            DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
-
-        queue = Volley.newRequestQueue(context)
-        request.setShouldCache(false)
-        queue.add(request)
-    }
 
 
 }
