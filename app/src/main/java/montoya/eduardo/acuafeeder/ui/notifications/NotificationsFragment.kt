@@ -27,6 +27,7 @@ import montoya.eduardo.acuafeeder.data_class.Command
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.agregarDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.agregarDevicesCommandBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.ui.dashboard.AdapterComando
 import org.json.JSONException
@@ -98,9 +99,10 @@ class NotificationsFragment : Fragment() {
                 if (verificarDatos(txtEtiqueta, txtPiscina, txtSN)){
                     if (otraAlberca){
                         handler.postDelayed(Runnable {
-                            agregarDevicesBD(disp, requireContext())
                             GlobalData.listaDevices.add(disp)
                             listaDevices = GlobalData.listaDevices
+                            agregarDevicesBD(disp, requireContext())
+                            agregarDevicesCommandBD(disp, requireContext())
                             txtEtiqueta.setText ("")
                             txtSN.setText ("")
                             layout2.layoutParams.height = 0
@@ -109,9 +111,10 @@ class NotificationsFragment : Fragment() {
                             listview.adapter = adaptador
                         }, 650)
                     }else{
-                        agregarDevicesBD(disp, requireContext())
                         GlobalData.listaDevices.add(disp)
                         listaDevices = GlobalData.listaDevices
+                        agregarDevicesBD(disp, requireContext())
+                        agregarDevicesCommandBD(disp, requireContext())
                         txtEtiqueta.setText ("")
                         txtSN.setText ("")
                         layout2.layoutParams.height = 0
@@ -178,6 +181,7 @@ class AdapterDevice: BaseAdapter {
 
     fun eliminarDevicesBD(dev: Devices){
         val URLAux = GlobalData.URL + "eliminar_devices.php"
+        val URLAux2 = GlobalData.URL + "eliminar_devicesCommand.php"
         val params = HashMap<String, String>()
         params["idDevice"] = dev.idDevices
         params["devices_user_id"] = GlobalData.idUser.toString()
@@ -194,12 +198,31 @@ class AdapterDevice: BaseAdapter {
                 }
             }
 
+        val request2: StringRequest =
+            object : StringRequest(Request.Method.POST, URLAux2, {
+                Toast.makeText(context, "Se elimino con exito: " + dev.devices_etiqueta, Toast.LENGTH_SHORT).show()
+            }, { error: VolleyError ->
+                println("Error $error.message")
+                Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+            }) {
+                override fun getParams(): Map<String, String> {
+                    return params
+                }
+            }
+
         request.retryPolicy =
+            DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
+        request2.retryPolicy =
             DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
 
         val queue: RequestQueue = Volley.newRequestQueue(context)
         request.setShouldCache(false)
         queue.add(request)
+
+
+        request2.setShouldCache(false)
+        queue.add(request2)
+
     }
 
     @SuppressLint("SetTextI18n", "ViewHolder", "InflateParams")

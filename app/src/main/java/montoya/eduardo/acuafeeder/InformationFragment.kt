@@ -26,7 +26,10 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerTempBD
 import montoya.eduardo.acuafeeder.data_class.temp
 import org.json.JSONException
@@ -129,7 +132,12 @@ class InformationFragment : Fragment() {
             if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
                 GlobalData.pool = txtNumPiscina.text.toString().toInt()
 
+                //Obtiene los datos de la BD
+                obtenerComandos(requireContext())
                 obtenerDevicesBD(requireContext())
+                obtenerDevicesComandoBD(requireContext())
+                obtenerComidaBD(requireContext())
+
                 handler.postDelayed(Runnable {
                     fillSpinner(selectDevice, context)
                 }, 750)

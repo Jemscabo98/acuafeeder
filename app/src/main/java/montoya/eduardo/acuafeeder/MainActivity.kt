@@ -8,6 +8,7 @@ import android.os.StrictMode
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -50,10 +51,9 @@ class MainActivity : AppCompatActivity() {
         obtenerDevicesBD(this)
         obtenerDevicesComandoBD(this)
         obtenerComidaBD(this)
-        obtenerTempBD(this)
         obtenerComandos(this)
 
-        setRepeatingAsyncTask(this)
+        setRepeatingAsyncTask(this, navController)
     }
 
     @Override
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setRepeatingAsyncTask(context: Context) {
+    private fun setRepeatingAsyncTask(context: Context, navController: NavController) {
         val handler = Handler(Looper.getMainLooper())
         val timer = Timer()
         val task: TimerTask = object : TimerTask() {
@@ -85,18 +85,18 @@ class MainActivity : AppCompatActivity() {
                         obtenerDevicesBD(context)
                         obtenerDevicesComandoBD(context)
                         obtenerComidaBD(context)
-                        obtenerTempBD(context)
                         obtenerComandos(context)
 
-                        Toast.makeText(context, "Cada miunto", Toast.LENGTH_LONG).show()
+                        val id = navController.currentDestination?.id
+                        navController.popBackStack(id!!,false)
+                        Toast.makeText(context, "Sincro App", Toast.LENGTH_LONG).show()
+                        navController.navigate(id)
                     } catch (e: Exception) {
-
-
                     }
                 })
             }
         }
-        timer.schedule(task, 0, 60 * 1000) // interval of one minute
+        timer.schedule(task, 45 * 1000, 45 * 1000) // interval of one minute
     }
 }
 

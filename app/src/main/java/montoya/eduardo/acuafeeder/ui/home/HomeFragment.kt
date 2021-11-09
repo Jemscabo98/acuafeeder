@@ -20,6 +20,9 @@ import com.jjoe64.graphview.series.DataPoint
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 
 
 class HomeFragment : Fragment() {
@@ -65,6 +68,9 @@ class HomeFragment : Fragment() {
 
                     //Obtiene los datos de la BD
                     obtenerComandos(requireContext())
+                    obtenerDevicesBD(requireContext())
+                    obtenerDevicesComandoBD(requireContext())
+                    obtenerComidaBD(requireContext())
 
                     handler.postDelayed(Runnable {
                         cargarDatos(graph)

@@ -55,7 +55,7 @@ class Log_In : AppCompatActivity() {
                        jsonArray= JSONArray(it)
                        var jsonObject = JSONObject(jsonArray[0].toString())
                        GlobalData.idUser = jsonObject.getString("users_id").toInt()
-                       Toast.makeText(this, jsonObject.getString("users_id"), Toast.LENGTH_LONG).show()
+                       //Toast.makeText(this, jsonObject.getString("users_id"), Toast.LENGTH_LONG).show()
                    } catch (error: JSONException) {
                        Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show()
                    }

@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
-import android.widget.CheckBox
 import android.widget.Toast
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
@@ -25,7 +24,7 @@ open class GlobalData: Application() {
        const val URL: String = "https://bytefruit.com/practicas-acuafeeder/php/"
        //val URL = "http://192.168.1.111:8080/acuafeeder/"
        var idUser: Int = 0
-       var pool: Int = 0
+       var pool: Int = 1
        var listaComandos: ArrayList<Command> = ArrayList()
 
        var listaTemp: ArrayList<temp> = ArrayList()
@@ -86,6 +85,41 @@ open class GlobalData: Application() {
            params["devices_etiqueta"] = dev.devices_etiqueta
            params["devices_piscina"] = pool.toString()
            params["devices_user_id"] = idUser.toString()
+
+           val request: StringRequest =
+               object : StringRequest(Request.Method.POST, URLAux, {
+                   //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+               }, { error: VolleyError ->
+                   println("Error $error.message")
+                   Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+               }) {
+                   override fun getParams(): Map<String, String> {
+                       return params
+                   }
+               }
+
+           request.retryPolicy =
+               DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
+
+           queue = Volley.newRequestQueue(context)
+           request.setShouldCache(false)
+           queue.add(request)
+       }
+
+       fun agregarDevicesCommandBD(dev: Devices, context: Context){
+           val URLAux = URL + "insertar_devicesCommand.php"
+           val params = HashMap<String, String>()
+           params["idDevice"] = dev.idDevices
+           params["idUser"] = idUser.toString()
+           params["piscina"] = pool.toString()
+           params["dispositivosXpiscina"] = listaDevices.size.toString()
+           params["Modo"] = deviceCom.modo.toString()
+           params["PIN"] = "NXNX"
+           params["enviarProgramacion"] = 1.toString()
+           params["ManualSw"] = deviceCom.manualSW.toString()
+           params["AlimentoTotal"] = deviceCom.alimentoTotal.toString()
+           params["grPorSegundo"] = selectFood.allimentoGrSeg.toString()
+           params["reloj"] = "0"
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
