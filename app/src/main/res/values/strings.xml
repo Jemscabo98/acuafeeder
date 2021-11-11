@@ -21,7 +21,7 @@
     <string name="btnRegistrar">Registrar</string>
     <string name="btnEliminar">Eliminar</string>
 
-    <string name="introInicio">HISTORIAL DE BALANCEADO DOSIFICADO</string>
+    <string name="introInicio">PROGRAMACIÓN DISPOSITIVOS</string>
     <string name="seleccioneFecha">SELECCIONE UNA FECHA: </string>
 
     <string name="alertaNombre">NOMBRE DE ALERTA</string>

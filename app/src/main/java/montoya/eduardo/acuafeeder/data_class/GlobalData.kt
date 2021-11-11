@@ -28,7 +28,7 @@ open class GlobalData: Application() {
        var listaComandos: ArrayList<Command> = ArrayList()
 
        var listaTemp: ArrayList<temp> = ArrayList()
-       var fechaTemp: String = ""
+       var fechaTemp: String = "2021-07-07"
        var listaDevices: ArrayList<Devices> = ArrayList()
        var deviceTemp: String = ""
 
@@ -49,6 +49,7 @@ open class GlobalData: Application() {
 
                {
                    listaDevices.clear()
+                   listaDevices = ArrayList()
                    var jsonObject: JSONObject? = null
                    for (i in 0 until it.length()) {
                        try {
@@ -123,7 +124,13 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   if (it.contains("Agregar")){
+
+                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   }else{
+                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
                    Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
@@ -151,10 +158,14 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+
+                   if (it.contains("Actualizar")){
+                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
-                   Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   Toast.makeText(context, "Error $error.message", Toast.LENGTH_SHORT).show()
                }) {
                    override fun getParams(): Map<String, String> {
                        return params
@@ -169,8 +180,8 @@ open class GlobalData: Application() {
            queue.add(request)
        }
 
-       fun obtenerDevicesComandoBD(context: Context){
-           val URLAux = URL + "buscar_deviceCommando.php?piscina=" + pool
+       fun obtenerDevicesComandoBD(context: Context, piscina: Int){
+           val URLAux = URL + "buscar_deviceCommando.php?piscina=" + piscina
 
            val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(
                Request.Method.GET,
@@ -178,12 +189,11 @@ open class GlobalData: Application() {
                null,
 
                {
-                   listaDevices.clear()
                    var jsonObject: JSONObject? = null
                    for (i in 0 until it.length()) {
                        try {
                            jsonObject = it.getJSONObject(i)
-                           val deviceCom: deviceCommand = deviceCommand(pool)
+                           val deviceCom: deviceCommand = deviceCommand(piscina)
                            deviceCom.dispositivosXpiscina = jsonObject.getInt("dispositivosXpiscina")
                            deviceCom.modo = jsonObject.getInt("Modo")
                            deviceCom.manualSW = jsonObject.getInt("ManualSw")
@@ -253,7 +263,7 @@ open class GlobalData: Application() {
            queue.add(jsonArrayRequest)
        }
 
-       fun updateCommand(idDevice: String, ID: String, com: Command,context: Context){
+       fun updateCommand(ID: String, com: Command,context: Context){
            val URLAux = URL + "actualizar_comando.php"
            val params = HashMap<String, String>()
            params["piscina"] = pool.toString()
@@ -269,10 +279,16 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   //Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+
+                   if (it.contains("Actualizar")){
+                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   }else{
+                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
-                   //Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
                }) {
                    override fun getParams(): Map<String, String> {
                        return params
@@ -303,7 +319,13 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+
+                   if (it.contains("Agregar")){
+                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   }else{
+                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
                    Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
@@ -330,7 +352,15 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   Toast.makeText(context, "Se elimino el comando con exito", Toast.LENGTH_SHORT).show()
+
+                   if (it.contains("Eliminar")) {
+                       Toast.makeText(context,
+                           "Se elimino el comando con exito",
+                           Toast.LENGTH_SHORT).show()
+                   } else {
+                       Toast.makeText(context, "No se pudo eliminar el comando", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
                    Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
@@ -356,10 +386,17 @@ open class GlobalData: Application() {
            params["enviarProgramacion"] = com.enviarProgramacion.toString()
            params["piscina"] = pool.toString()
            params["idUser"] = idUser.toString()
+           params["dispositivosXpiscina"] = listaDevices.size.toString()
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+
+                   if (it.contains("Actualizar")){
+                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                   }else{
+                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                   }
+
                }, { error: VolleyError ->
                    println("Error $error.message")
                    Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
@@ -451,7 +488,45 @@ open class GlobalData: Application() {
 
            queue = Volley.newRequestQueue(context)
            queue.add(jsonArrayRequest)
-       }}
+       }
+
+       fun actualizar_enviarProgramacion(context: Context, piscina: Int, numDisp: Int){
+           val URLAux = URL + "actualizar_enviarProgramacion.php"
+           val params = HashMap<String, String>()
+           params["piscina"] = piscina.toString()
+           params["idUser"] = idUser.toString()
+           params["dispositivosXpiscina"] = numDisp.toString()
+           params["enviarProgramacion"] = 0.toString()
+
+           /*
+           * UPDATE device_command SET enviarProgramacion = 2 WHERE piscina = 1 AND idUser =7
+           * */
+
+           val request: StringRequest =
+               object : StringRequest(Request.Method.POST, URLAux, {
+
+                   if (!it.contains("Actualizar")) {
+                       Toast.makeText(context, "Problemas de Conexion", Toast.LENGTH_SHORT).show()
+                   }
+
+               }, { error: VolleyError ->
+                   println("Error $error.message")
+                   Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+               }) {
+                   override fun getParams(): Map<String, String> {
+                       return params
+                   }
+               }
+
+           request.retryPolicy =
+               DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 0, 1f)
+
+           queue = Volley.newRequestQueue(context)
+           request.setShouldCache(false)
+           queue.add(request)
+       }
+   }
+
 
     override fun onCreate() {
         super.onCreate()

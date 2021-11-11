@@ -15,27 +15,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
 import com.jjoe64.graphview.DefaultLabelFormatter
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
-import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerTempBD
-import montoya.eduardo.acuafeeder.data_class.temp
-import org.json.JSONException
-import org.json.JSONObject
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.pool
 import java.sql.Time
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -66,6 +60,11 @@ class InformationFragment : Fragment() {
         val selectDevice: Spinner = root.findViewById(R.id.selectDevice)
         val btnBuscarDispositivos: Button = root.findViewById(R.id.btnBuscarDispositivos)
 
+        //Inicializa la clase padre para poder modificar la picina en la cabecera
+        val aux = activity as MainActivity
+        val actbar = aux.getSupportActionBar() as ActionBar
+        val texto: EditText = actbar.customView.findViewById(R.id.idPiscina)
+
         //Pone el dia actual como fecha automatica
         if (GlobalData.fechaTemp==""){
             val cal: Calendar = Calendar.getInstance() //Objeto Calendario
@@ -81,16 +80,17 @@ class InformationFragment : Fragment() {
         txtNumPiscina.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE)
 
         //Llena los datos al select box
-        if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool){
+        if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != pool) {
             GlobalData.listaDevices = ArrayList()
 
-            //Llena la lista del Spinner
             obtenerDevicesBD(requireContext())
 
             handler.postDelayed(Runnable {
+                //Llena la lista del Spinner
                 fillSpinner(selectDevice, context)
             }, 750)
         }else{
+
             fillSpinner(selectDevice, context)
         }
 
@@ -98,9 +98,10 @@ class InformationFragment : Fragment() {
 
         handler.postDelayed(Runnable {
             graficarResultados(graph)
-        }, 50)
+        }, 350)
 
 
+        //Accion de seleciionar la fecha
         btnSelecFecha.setOnClickListener {
             //Variables
             val cal: Calendar = Calendar.getInstance() //Objeto Calendario
@@ -128,14 +129,16 @@ class InformationFragment : Fragment() {
             selecFechaAux.show()
         }
 
+        //Busca dispositivos y actualiza la piscina global
         btnBuscarDispositivos.setOnClickListener {
             if (TextUtils.isDigitsOnly(txtNumPiscina.text)){
                 GlobalData.pool = txtNumPiscina.text.toString().toInt()
+                texto.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE);
 
                 //Obtiene los datos de la BD
                 obtenerComandos(requireContext())
                 obtenerDevicesBD(requireContext())
-                obtenerDevicesComandoBD(requireContext())
+                obtenerDevicesComandoBD(requireContext(), pool)
                 obtenerComidaBD(requireContext())
 
                 handler.postDelayed(Runnable {
@@ -149,6 +152,7 @@ class InformationFragment : Fragment() {
             }
         }
 
+        //Se selecciona un dispositivo de la lista
         selectDevice.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 GlobalData.deviceTemp = GlobalData.listaDevices.get(0).idDevices
@@ -169,12 +173,13 @@ class InformationFragment : Fragment() {
 
         }
 
+
         btnActualizarGraph.setOnClickListener {
             obtenerTempBD(requireContext())
 
             handler.postDelayed(Runnable {
                 graficarResultados(graph)
-            }, 50)
+            }, 250)
         }
         return root
     }
@@ -210,6 +215,7 @@ class InformationFragment : Fragment() {
         }
     }
 
+    //Convierte los datos de la BD en datos que pueda leer la grafica
     fun getDataBD(): Array<DataPoint> {
         val arrayListLineaTemp: ArrayList<DataPoint> = ArrayList()
         val listaTiempo: ArrayList<Time> = ArrayList()
@@ -226,6 +232,7 @@ class InformationFragment : Fragment() {
         return arrayLineaTemp
     }
 
+    // Llena la lista de dispositivos visual del usuario
     fun fillSpinner(selectDevice: Spinner, context: Context?){
         if (context!=null){
                 val listaAux: ArrayList<String> = ArrayList()

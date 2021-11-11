@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -43,6 +44,7 @@ class NotificationsFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var disp: Devices
     private lateinit var listaDevices: ArrayList<Devices>
+    private  lateinit var texto: EditText
     private var otraAlberca: Boolean = false
 
     @SuppressLint("SetTextI18n")
@@ -63,13 +65,18 @@ class NotificationsFragment : Fragment() {
             val txtPiscina: EditText = root.findViewById(R.id.txtPiscina)
             val txtSN: EditText = root.findViewById(R.id.txtSN)
             val txtGuardarDevice: Button = root.findViewById(R.id.txtGuardarDevice)
+
             listaDevices = ArrayList()
-            listaDevices.clear()
             listview.adapter = null
             var adaptador: AdapterDevice = AdapterDevice(context, listaDevices)
             adaptador.notifyDataSetChanged()
+
             disp = Devices("",GlobalData.pool)
             txtPiscina.setText(GlobalData.pool.toString())
+
+            val aux = activity as MainActivity
+            val actbar = aux.getSupportActionBar() as ActionBar
+            texto = actbar.customView.findViewById(R.id.idPiscina)
 
             if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool) {
                 GlobalData.listaDevices = ArrayList()
@@ -134,6 +141,16 @@ class NotificationsFragment : Fragment() {
             Toast.makeText(context, "Favor de no dejar espacios vacios", Toast.LENGTH_LONG).show()
             return false
         }
+
+        for(x in GlobalData.listaDevices){
+            if (txtEtiqueta.text.toString() == x.devices_etiqueta){
+                Toast.makeText(context, "Favor de no repetir el mismo nombre", Toast.LENGTH_LONG).show()
+                return false
+            }
+
+
+        }
+
         disp.idDevices = txtSN.text.toString()
         disp.fechaCreacion = Timestamp(System.currentTimeMillis())
         disp.userID = GlobalData.idUser
@@ -141,6 +158,7 @@ class NotificationsFragment : Fragment() {
 
         if(GlobalData.pool != txtPiscina.text.toString().toInt()){
             GlobalData.pool = txtPiscina.text.toString().toInt()
+            texto.setText(GlobalData.pool.toString(), TextView.BufferType.EDITABLE);
             disp.pool = GlobalData.pool
             GlobalData.obtenerDevicesBD(requireContext())
             otraAlberca = true
@@ -188,10 +206,10 @@ class AdapterDevice: BaseAdapter {
 
         val request: StringRequest =
             object : StringRequest(Request.Method.POST, URLAux, {
-                Toast.makeText(context, "Se elimino con exito: " + dev.devices_etiqueta, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Se elimino con exito: " + dev.devices_etiqueta, Toast.LENGTH_SHORT).show()
             }, { error: VolleyError ->
                 println("Error $error.message")
-                Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
             }) {
                 override fun getParams(): Map<String, String> {
                     return params
@@ -200,8 +218,17 @@ class AdapterDevice: BaseAdapter {
 
         val request2: StringRequest =
             object : StringRequest(Request.Method.POST, URLAux2, {
-                Toast.makeText(context, "Se elimino con exito: " + dev.devices_etiqueta, Toast.LENGTH_SHORT).show()
-            }, { error: VolleyError ->
+
+                if (it.contains("Eliminar")) {
+                    Toast.makeText(context,
+                        "Se elimino el dispositivo con exito",
+                        Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "No se pudo eliminar el dispositivo", Toast.LENGTH_SHORT).show()
+                }
+
+
+                }, { error: VolleyError ->
                 println("Error $error.message")
                 Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
             }) {

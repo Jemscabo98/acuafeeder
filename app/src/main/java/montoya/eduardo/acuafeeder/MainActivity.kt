@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
-import android.widget.Toast
+import android.view.inputmethod.EditorInfo
+import android.widget.*
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.NavController
@@ -15,17 +17,28 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.deviceCom
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerTempBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.pool
+import montoya.eduardo.acuafeeder.data_class.deviceCommand
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+    private var alerta: Boolean = true
+    private var piscinaAux: Int = pool
+    val timer = Timer()
+    lateinit var navController: NavController
+    val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        actionBar(this)
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         GlobalData.pool = 1
 
-        val navController = findNavController(R.id.nav_host_fragment)
+        navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(setOf(
@@ -49,11 +62,10 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         obtenerDevicesBD(this)
-        obtenerDevicesComandoBD(this)
+        obtenerDevicesComandoBD(this, pool)
         obtenerComidaBD(this)
         obtenerComandos(this)
 
-        setRepeatingAsyncTask(this, navController)
     }
 
     @Override
@@ -75,7 +87,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setRepeatingAsyncTask(context: Context, navController: NavController) {
+    private fun actionBar(context: Context){
+        val actbar = getSupportActionBar() as ActionBar
+        getSupportActionBar()?.setCustomView(R.layout.actionbar)
+
+        val texto: EditText = actbar!!.customView.findViewById(R.id.idPiscina)
+        val btn: ImageButton = actbar.customView.findViewById(R.id.btnBuscarPiscina)
+
+        btn.setOnClickListener {
+            pool = texto.text.toString().toInt()
+            handler.postDelayed(Runnable {
+                obtenerComandos(this)
+                obtenerDevicesBD(this)
+                obtenerDevicesComandoBD(this, pool)
+                obtenerComidaBD(this)
+            }, 100)
+
+            handler.postDelayed(Runnable {
+                resetFragment()
+            }, 450)
+        }
+
+        actbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
+    }
+
+    fun resetFragment(){
+        val id = navController.currentDestination?.id
+        navController.popBackStack(id!!,false)
+        navController.navigate(id)
+    }
+
+    fun setRepeatingAsyncTask(context: Context) {
         val handler = Handler(Looper.getMainLooper())
         val timer = Timer()
         val task: TimerTask = object : TimerTask() {
@@ -83,7 +125,7 @@ class MainActivity : AppCompatActivity() {
                 handler.post(Runnable {
                     try {
                         obtenerDevicesBD(context)
-                        obtenerDevicesComandoBD(context)
+                        obtenerDevicesComandoBD(context, pool)
                         obtenerComidaBD(context)
                         obtenerComandos(context)
 
@@ -97,6 +139,33 @@ class MainActivity : AppCompatActivity() {
             }
         }
         timer.schedule(task, 45 * 1000, 45 * 1000) // interval of one minute
+    }
+
+    fun verificarActualizacionBD(context: Context, piscina: Int, numDisp: Int){
+        if (alerta || piscinaAux != piscina){
+            alerta = false
+            piscinaAux = piscina
+            val task: TimerTask = object : TimerTask() {
+                override fun run() {
+                    obtenerDevicesComandoBD(context, piscina)
+
+                    handler.postDelayed(Runnable {
+                        if (deviceCom.enviarProgramacion==2){
+                            Toast.makeText(context,
+                                "Las maquinas se actualizaron en la piscina: $piscina", Toast.LENGTH_LONG).show()
+                            GlobalData.actualizar_enviarProgramacion(context, piscina, numDisp)
+                        }
+                        else{
+                            Toast.makeText(context, "Las maquinas NO se actualizaron en la piscina: $piscina", Toast.LENGTH_LONG).show()
+                        }
+                    }, 450)
+                    alerta = true;
+                }
+            }
+            timer.schedule(task, 45 * 1000)
+        }
+
+
     }
 }
 

@@ -92,11 +92,7 @@ class EditCommand : Fragment() {
                 else
                     GlobalData.listaComandos.get(GlobalData.index).s = 0
 
-
-                for (n in GlobalData.listaDevices) {
-                    updateCommand(n.idDevices, aux.toString(), GlobalData.listaComandos.get(GlobalData.index), requireContext())
-                }
-
+                updateCommand(aux.toString(), GlobalData.listaComandos.get(GlobalData.index), requireContext())
                 salirFragmento()
             }
         }

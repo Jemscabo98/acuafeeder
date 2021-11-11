@@ -24,6 +24,7 @@ import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.DeleteCommand
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.pool
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateComida
 
 
@@ -52,13 +53,8 @@ class DashboardFragment : Fragment() {
             var adaptador: AdapterComando = AdapterComando(context, GlobalData.listaComandos)
             listview.adapter = adaptador
 
-            if (GlobalData.listaDevices.isEmpty() || GlobalData.listaDevices.get(0).pool != GlobalData.pool){
-                GlobalData.listaDevices = ArrayList()
-                obtenerDevicesBD(requireContext())
-            }
-
             if (GlobalData.deviceCom.grPorSegundo == 0 || GlobalData.deviceCom.pool != GlobalData.pool){
-                obtenerDevicesComandoBD(requireContext())
+                obtenerDevicesComandoBD(requireContext(), pool)
             }
 
 

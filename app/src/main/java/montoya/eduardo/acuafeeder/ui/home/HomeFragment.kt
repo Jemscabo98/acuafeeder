@@ -6,9 +6,8 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,12 +16,10 @@ import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
+import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 
 
 class HomeFragment : Fragment() {
@@ -40,11 +37,10 @@ class HomeFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
-            val btnBuscar: Button = root.findViewById(R.id.btnBuscarDispositivos)
-            val txtNumPiscina: EditText = root.findViewById(R.id.txtNumPiscina)
 
-            //GlobalData.listaComandos.clear()
-            txtNumPiscina.setText(GlobalData.pool.toString())
+            val aux = activity as MainActivity
+            val actbar = aux.getSupportActionBar() as ActionBar
+            val texto: EditText = actbar.customView.findViewById(R.id.idPiscina)
 
             if (GlobalData.listaComandos.isEmpty()){
                 GlobalData.listaComandos = ArrayList()
@@ -59,31 +55,10 @@ class HomeFragment : Fragment() {
                 cargarDatos(graph)
             }
 
-
-            //Cuando se le de click al boton
-            btnBuscar.setOnClickListener {
-                //Verifica que el dato sea un numero
-                if (checarDato(txtNumPiscina)) {
-                    GlobalData.pool = txtNumPiscina.text.toString().toInt()
-
-                    //Obtiene los datos de la BD
-                    obtenerComandos(requireContext())
-                    obtenerDevicesBD(requireContext())
-                    obtenerDevicesComandoBD(requireContext())
-                    obtenerComidaBD(requireContext())
-
-                    handler.postDelayed(Runnable {
-                        cargarDatos(graph)
-                     },500)
-                } else {
-                    Toast.makeText(context,
-                        "Favor de solo usar números en piscina",
-                        Toast.LENGTH_LONG).show()
-                }
-            }
         })
         return root
     }
+
 
     //Verifica que el numero de psicina sea numerico
     fun checarDato(txtNumPiscina: EditText): Boolean{
