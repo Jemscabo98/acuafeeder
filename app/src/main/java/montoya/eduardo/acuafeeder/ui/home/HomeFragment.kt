@@ -38,6 +38,8 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
 
+            GlobalData.MainAct = activity as MainActivity
+
             val aux = activity as MainActivity
             val actbar = aux.getSupportActionBar() as ActionBar
             val texto: EditText = actbar.customView.findViewById(R.id.idPiscina)

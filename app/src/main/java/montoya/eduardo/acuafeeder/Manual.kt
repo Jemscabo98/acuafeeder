@@ -10,18 +10,18 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import com.android.volley.RequestQueue
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.MainAct
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.actualizar_enviarProgramacion
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.deviceCom
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.listaDevices
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.pool
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateComida
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateManual
 
 
 class Manual : Fragment() {
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
-    private lateinit var aux: MainActivity
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -33,10 +33,10 @@ class Manual : Fragment() {
         val btnOff: Button = root.findViewById(R.id.btnOff)
         val btnEntrar: Button = root.findViewById(R.id.btnEntrar)
         val btnSalir: Button = root.findViewById(R.id.btnSalir)
+        val btnActualizarManual: Button = root.findViewById(R.id.btnActualizarManual)
         val sensorFeeder: LinearLayout = root.findViewById(R.id.sensorFeeder)
         val sensorManual: LinearLayout = root.findViewById(R.id.sensorManual)
 
-        aux = activity as MainActivity
 
         if (listaDevices.isEmpty() || listaDevices.get(0).pool != pool) {
             listaDevices = ArrayList()
@@ -60,32 +60,29 @@ class Manual : Fragment() {
 
         btnEntrar.setOnClickListener {
             sensorManual.setBackgroundResource(R.drawable.circle_red)
-            GlobalData.deviceCom.manualSW = 1
-            updateManual(requireContext())
-            aux.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            deviceCom.manualSW = 1
         }
 
         btnSalir.setOnClickListener {
             sensorManual.setBackgroundResource(R.drawable.circle_black)
-            GlobalData.deviceCom.manualSW = 0
-            updateManual(requireContext())
-            aux.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            deviceCom.manualSW = 0
         }
 
         btnOn.setOnClickListener {
             sensorFeeder.setBackgroundResource(R.drawable.circle_red)
-            GlobalData.deviceCom.modo = 1
-            updateManual(requireContext())
-            aux.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            deviceCom.modo = 1
         }
 
         btnOff.setOnClickListener {
             sensorFeeder.setBackgroundResource(R.drawable.circle_black)
-            GlobalData.deviceCom.modo = 0
-            updateManual(requireContext())
-            aux.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            deviceCom.modo = 0
         }
 
+        btnActualizarManual.setOnClickListener{
+            updateManual(requireContext())
+            actualizar_enviarProgramacion(requireContext(), pool, listaDevices.size, 1)
+            MainAct.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+        }
 
         return root
     }

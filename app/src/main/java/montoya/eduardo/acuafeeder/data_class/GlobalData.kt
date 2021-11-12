@@ -12,6 +12,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import montoya.eduardo.acuafeeder.MainActivity
 import org.json.JSONException
 import org.json.JSONObject
 import java.sql.Timestamp
@@ -22,6 +23,7 @@ open class GlobalData: Application() {
    companion object{
        private lateinit var queue: RequestQueue
        const val URL: String = "https://bytefruit.com/practicas-acuafeeder/php/"
+       lateinit var MainAct: MainActivity
        //val URL = "http://192.168.1.111:8080/acuafeeder/"
        var idUser: Int = 0
        var pool: Int = 1
@@ -390,12 +392,9 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
+                   Toast.makeText(context,
+                       "Se mando la información con exito", Toast.LENGTH_LONG).show()
 
-                   if (it.contains("Actualizar")){
-                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
-                   }else{
-                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
-                   }
 
                }, { error: VolleyError ->
                    println("Error $error.message")
@@ -490,13 +489,13 @@ open class GlobalData: Application() {
            queue.add(jsonArrayRequest)
        }
 
-       fun actualizar_enviarProgramacion(context: Context, piscina: Int, numDisp: Int){
+       fun actualizar_enviarProgramacion(context: Context, piscina: Int, numDisp: Int, enviarProgramacion: Int){
            val URLAux = URL + "actualizar_enviarProgramacion.php"
            val params = HashMap<String, String>()
            params["piscina"] = piscina.toString()
            params["idUser"] = idUser.toString()
            params["dispositivosXpiscina"] = numDisp.toString()
-           params["enviarProgramacion"] = 0.toString()
+           params["enviarProgramacion"] = enviarProgramacion.toString()
 
            /*
            * UPDATE device_command SET enviarProgramacion = 2 WHERE piscina = 1 AND idUser =7
@@ -504,10 +503,6 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-
-                   if (!it.contains("Actualizar")) {
-                       Toast.makeText(context, "Problemas de Conexion", Toast.LENGTH_SHORT).show()
-                   }
 
                }, { error: VolleyError ->
                    println("Error $error.message")

@@ -134,6 +134,15 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnActualizarManual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/btnActualizar"
+        android:layout_marginTop="@dimen/activity_vertical_margin"/>
+
 </LinearLayout>
 
 </LinearLayout>

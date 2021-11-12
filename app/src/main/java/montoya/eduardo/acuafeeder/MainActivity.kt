@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        GlobalData.pool = 1
+        pool = 1
 
         navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
@@ -149,16 +149,18 @@ class MainActivity : AppCompatActivity() {
                 override fun run() {
                     obtenerDevicesComandoBD(context, piscina)
 
-                    handler.postDelayed(Runnable {
+
+                    handler.postDelayed(Runnable {Toast.makeText(context, deviceCom.enviarProgramacion.toString(), Toast.LENGTH_LONG).show()
+
                         if (deviceCom.enviarProgramacion==2){
                             Toast.makeText(context,
                                 "Las maquinas se actualizaron en la piscina: $piscina", Toast.LENGTH_LONG).show()
-                            GlobalData.actualizar_enviarProgramacion(context, piscina, numDisp)
+                            GlobalData.actualizar_enviarProgramacion(context, piscina, numDisp, 0)
                         }
                         else{
                             Toast.makeText(context, "Las maquinas NO se actualizaron en la piscina: $piscina", Toast.LENGTH_LONG).show()
                         }
-                    }, 450)
+                    }, 850)
                     alerta = true;
                 }
             }

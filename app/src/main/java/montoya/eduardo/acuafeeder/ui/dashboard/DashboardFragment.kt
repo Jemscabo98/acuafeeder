@@ -21,6 +21,8 @@ import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.*
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.AddCommand
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.DeleteCommand
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.MainAct
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.actualizar_enviarProgramacion
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
@@ -114,6 +116,8 @@ class DashboardFragment : Fragment() {
                 GlobalData.deviceCom.grPorSegundo = GlobalData.selectFood.allimentoGrSeg
                 GlobalData.deviceCom.enviarProgramacion = 1
                 updateComida(GlobalData.deviceCom, requireContext())
+                actualizar_enviarProgramacion(requireContext(), pool, GlobalData.listaDevices.size, 1)
+                MainAct.verificarActualizacionBD(requireContext(), pool, GlobalData.listaDevices.size)
             }
 
 
