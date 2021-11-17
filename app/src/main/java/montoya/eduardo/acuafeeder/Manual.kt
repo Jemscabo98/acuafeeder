@@ -79,9 +79,13 @@ class Manual : Fragment() {
         }
 
         btnActualizarManual.setOnClickListener{
-            updateManual(requireContext())
-            actualizar_enviarProgramacion(requireContext(), pool, listaDevices.size, 1)
-            MainAct.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            if (GlobalData.alerta) {
+                updateManual(requireContext())
+                actualizar_enviarProgramacion(requireContext(), pool, listaDevices.size, 1)
+                MainAct.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
+            }else{
+                Toast.makeText(context, "En espera de comprobacion", Toast.LENGTH_SHORT).show()
+            }
         }
 
         return root

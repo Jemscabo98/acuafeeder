@@ -39,6 +39,8 @@ open class GlobalData: Application() {
        var deviceCom: deviceCommand = deviceCommand(pool)
        var selectFood: Comida = Comida(pool)
 
+       var alerta: Boolean = true
+
 
         //Metodos para acceder a BD
        fun obtenerDevicesBD(context: Context){
@@ -162,7 +164,8 @@ open class GlobalData: Application() {
                object : StringRequest(Request.Method.POST, URLAux, {
 
                    if (it.contains("Actualizar")){
-                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                       Toast.makeText(context,
+                           "Se mando la información con exito", Toast.LENGTH_LONG).show()
                    }
 
                }, { error: VolleyError ->
@@ -394,7 +397,6 @@ open class GlobalData: Application() {
                object : StringRequest(Request.Method.POST, URLAux, {
                    Toast.makeText(context,
                        "Se mando la información con exito", Toast.LENGTH_LONG).show()
-
 
                }, { error: VolleyError ->
                    println("Error $error.message")

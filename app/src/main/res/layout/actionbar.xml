@@ -2,34 +2,70 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="right"
     android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:text="@string/numPiscina"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="9"
+        android:orientation="horizontal"
+        android:layout_marginStart="@dimen/activity_horizontal_margin">
 
-    <EditText
-        android:id="@+id/idPiscina"
-        android:layout_width="45dp"
-        android:layout_height="wrap_content"
-        android:text="1"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        android:autofillHints=""
-        android:inputType="number"
-        tools:ignore="LabelFor" />
+        <ProgressBar
+            android:id="@+id/barraCarga"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
 
-    <ImageButton
-        android:id="@+id/btnBuscarPiscina"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/txtProgreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="75%"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_baseline_search_24"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:text="@string/btnBuscar" />
+        android:layout_weight="9"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:textSize="16sp"
+            android:text="@string/numPiscina"/>
+
+        <EditText
+            android:id="@+id/idPiscina"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:autofillHints=""
+            android:inputType="number"
+            tools:ignore="LabelFor" />
+
+        <ImageButton
+            android:id="@+id/btnBuscarPiscina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_search_24"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/btnBuscar" />
+
+    </LinearLayout>
 
 </LinearLayout>
