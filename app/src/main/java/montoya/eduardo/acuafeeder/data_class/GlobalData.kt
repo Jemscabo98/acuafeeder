@@ -27,6 +27,7 @@ open class GlobalData: Application() {
        //val URL = "http://192.168.1.111:8080/acuafeeder/"
        var idUser: Int = 0
        var pool: Int = 1
+       var listaComandosOriginal: ArrayList<Command> = ArrayList()
        var listaComandos: ArrayList<Command> = ArrayList()
 
        var listaTemp: ArrayList<temp> = ArrayList()
@@ -235,6 +236,7 @@ open class GlobalData: Application() {
 
                {
                    listaComandos.clear()
+                   listaComandosOriginal.clear()
                    var jsonObject: JSONObject? = null
                    for (i in 0 until it.length()) {
                        try {
@@ -248,6 +250,7 @@ open class GlobalData: Application() {
                            command.s = jsonObject.getInt("s")
 
                            listaComandos.add(command)
+                           listaComandosOriginal.add(command)
 
                        } catch (error: JSONException) {
                            Toast.makeText(context, "Problemas de conexión", Toast.LENGTH_SHORT).show()
@@ -284,11 +287,8 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-
                    if (it.contains("Actualizar")){
-                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
-                   }else{
-                       Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
+                       Toast.makeText(context, "Se actualizo el comando $ID", Toast.LENGTH_SHORT).show()
                    }
 
                }, { error: VolleyError ->
@@ -326,7 +326,7 @@ open class GlobalData: Application() {
                object : StringRequest(Request.Method.POST, URLAux, {
 
                    if (it.contains("Agregar")){
-                       Toast.makeText(context, "Operacion Exitosa", Toast.LENGTH_SHORT).show()
+                       Toast.makeText(context, "Se agrego el comando $ID", Toast.LENGTH_SHORT).show()
                    }else{
                        Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
                    }
@@ -360,10 +360,10 @@ open class GlobalData: Application() {
 
                    if (it.contains("Eliminar")) {
                        Toast.makeText(context,
-                           "Se elimino el comando con exito",
+                           "Se elimino el comando $ID",
                            Toast.LENGTH_SHORT).show()
                    } else {
-                       Toast.makeText(context, "No se pudo eliminar el comando", Toast.LENGTH_SHORT).show()
+                       Toast.makeText(context, "No se pudo eliminar el comando $ID", Toast.LENGTH_SHORT).show()
                    }
 
                }, { error: VolleyError ->
@@ -386,8 +386,11 @@ open class GlobalData: Application() {
        fun updateComida(com: deviceCommand, context: Context){
            val URLAux = URL + "actualizar_comidaXpool.php"
            val params = HashMap<String, String>()
+           val comidaT = com.alimentoTotal
+           val tipoComida = selectFood.idFood
+
            params["grPorSegundo"] = com.grPorSegundo.toString()
-           params["AlimentoTotal"] = com.alimentoTotal.toString()
+           params["AlimentoTotal"] = comidaT.toString()
            params["enviarProgramacion"] = com.enviarProgramacion.toString()
            params["piscina"] = pool.toString()
            params["idUser"] = idUser.toString()
@@ -395,9 +398,9 @@ open class GlobalData: Application() {
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {
-                   Toast.makeText(context,
-                       "Se mando la información con exito", Toast.LENGTH_LONG).show()
-
+                   if (it.contains("Actualizar")){
+                        Toast.makeText(context, "Se Actualizo el Alimento: $tipoComida y el Total: $comidaT", Toast.LENGTH_SHORT).show()
+                    }
                }, { error: VolleyError ->
                    println("Error $error.message")
                    Toast.makeText(context, "Error de Conexion", Toast.LENGTH_SHORT).show()
@@ -498,10 +501,6 @@ open class GlobalData: Application() {
            params["idUser"] = idUser.toString()
            params["dispositivosXpiscina"] = numDisp.toString()
            params["enviarProgramacion"] = enviarProgramacion.toString()
-
-           /*
-           * UPDATE device_command SET enviarProgramacion = 2 WHERE piscina = 1 AND idUser =7
-           * */
 
            val request: StringRequest =
                object : StringRequest(Request.Method.POST, URLAux, {

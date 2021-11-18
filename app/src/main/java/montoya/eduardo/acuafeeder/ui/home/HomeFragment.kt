@@ -1,5 +1,7 @@
 package montoya.eduardo.acuafeeder.ui.home
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.*
 import android.text.TextUtils
@@ -11,14 +13,17 @@ import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.android.volley.RequestQueue
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
+import montoya.eduardo.acuafeeder.Log_In
 import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.GlobalData
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.idUser
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
 
 
@@ -26,6 +31,8 @@ class HomeFragment : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var edit: SharedPreferences.Editor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +44,10 @@ class HomeFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             val graph: GraphView = root.findViewById(R.id.graph) as GraphView
-
+            val btnCerrrar: Button = root.findViewById(R.id.btnCerrar_Sesion)
+            sharedPref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            edit = sharedPref.edit()
+            
             GlobalData.MainAct = activity as MainActivity
 
             val aux = activity as MainActivity
@@ -53,8 +63,17 @@ class HomeFragment : Fragment() {
                     cargarDatos(graph)
                 },500)
             }
+            
             if (GlobalData.listaComandos.isNotEmpty()){
                 cargarDatos(graph)
+            }
+            
+            btnCerrrar.setOnClickListener {
+                edit.putInt("idUser", 0)
+                edit.apply()
+
+                val intent = Intent(requireContext(), Log_In::class.java)
+                this.startActivity(intent)
             }
 
         })

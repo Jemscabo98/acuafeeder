@@ -151,4 +151,5 @@
     <string name="txtpiscina">Piscina</string>
     <string name="txtEtiqueta">Etiqueta</string>
     <string name="txtSN">SN</string>
+    <string name="cerrar_sesion">CERRAR SESION</string>
 </resources>

@@ -2,6 +2,7 @@ package montoya.eduardo.acuafeeder
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.*
 import android.view.View
 import android.widget.*
@@ -13,6 +14,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.alerta
@@ -34,6 +36,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var navController: NavController
     lateinit var barraCarga: ProgressBar
     lateinit var txtProgreso: TextView
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var edit: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -63,6 +67,13 @@ class MainActivity : AppCompatActivity() {
             R.id.navigation_manual))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+
+        //Si fue autocompletar carga el ID
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        edit = sharedPref.edit()
+
+        GlobalData.idUser = sharedPref.getInt("idUser", 0)
 
         //Obtienen datos generales
         obtenerDevicesBD(this)

@@ -85,14 +85,12 @@ class EditCommand : Fragment() {
 
         btnGuardar.setOnClickListener {
             if(verificarDatos(com)){
-                val aux = GlobalData.index+1
 
                 if (txtSComando.isChecked)
                     GlobalData.listaComandos.get(GlobalData.index).s = 1
                 else
                     GlobalData.listaComandos.get(GlobalData.index).s = 0
 
-                updateCommand(aux.toString(), GlobalData.listaComandos.get(GlobalData.index), requireContext())
                 salirFragmento()
             }
         }

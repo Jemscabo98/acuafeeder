@@ -24,12 +24,16 @@ import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.DeleteCommand
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.MainAct
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.actualizar_enviarProgramacion
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.alerta
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.listaComandos
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.listaComandosOriginal
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.listaDevices
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComidaBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesComandoBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.pool
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateComida
+import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateCommand
+import java.util.logging.Logger
 
 
 class DashboardFragment : Fragment() {
@@ -88,29 +92,34 @@ class DashboardFragment : Fragment() {
             btnAdd.setOnClickListener {
                 val com: Command = Command(GlobalData.pool)
                 if (AddList(com)) {
-                    AddCommand(GlobalData.listaComandos.size.toString(), com, requireContext())
+                    //AddCommand(GlobalData.listaComandos.size.toString(), com, requireContext())
                 }
                 adaptador = AdapterComando(context, GlobalData.listaComandos)
                 listview.adapter = adaptador
             }
 
             btnMinus.setOnClickListener {
-                val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-                builder.setCancelable(true)
-                builder.setTitle("Confirmación")
-                builder.setMessage("¿Seguro que desea eliminar el ultimo comando?")
-                builder.setPositiveButton("Confirmar",
-                    DialogInterface.OnClickListener { dialog, which ->
-                        DeleteCommand(GlobalData.listaComandos.size.toString(), requireContext())
-                        GlobalData.listaComandos.removeLast()
-                        adaptador = AdapterComando(context, GlobalData.listaComandos)
-                        listview.adapter = adaptador
-                    })
-                builder.setNegativeButton("Cancelar",
-                    DialogInterface.OnClickListener { dialog, which -> })
+                if (GlobalData.listaComandos.size ==1){
+                    Toast.makeText(requireContext(), "Se necesita minimo 1 comando", Toast.LENGTH_LONG).show()
+                }else {
 
-                val dialog: AlertDialog = builder.create()
-                dialog.show()
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+                    builder.setCancelable(true)
+                    builder.setTitle("Confirmación")
+                    builder.setMessage("¿Seguro que desea eliminar el ultimo comando?")
+                    builder.setPositiveButton("Confirmar",
+                        DialogInterface.OnClickListener { dialog, which ->
+                            //DeleteCommand(GlobalData.listaComandos.size.toString(), requireContext())
+                            GlobalData.listaComandos.removeLast()
+                            adaptador = AdapterComando(context, GlobalData.listaComandos)
+                            listview.adapter = adaptador
+                        })
+                    builder.setNegativeButton("Cancelar",
+                        DialogInterface.OnClickListener { dialog, which -> })
+
+                    val dialog: AlertDialog = builder.create()
+                    dialog.show()
+                }
             }
 
             btnAct.setOnClickListener {
@@ -119,6 +128,7 @@ class DashboardFragment : Fragment() {
                 GlobalData.deviceCom.enviarProgramacion = 1
 
                 if (alerta) {
+                    mandarDatosBD(requireContext())
                     updateComida(GlobalData.deviceCom, requireContext())
                     actualizar_enviarProgramacion(requireContext(), pool, listaDevices.size,1)
                     MainAct.verificarActualizacionBD(requireContext(), pool, listaDevices.size)
@@ -126,8 +136,6 @@ class DashboardFragment : Fragment() {
                     Toast.makeText(context, "En espera de comprobacion", Toast.LENGTH_SHORT).show()
                 }
             }
-
-
 
             selectComida.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -188,6 +196,37 @@ class DashboardFragment : Fragment() {
             } catch (e: java.lang.IndexOutOfBoundsException) {
 
             }
+        }
+    }
+
+    fun mandarDatosBD(context: Context){
+        if (listaComandos.size >= listaComandosOriginal.size){
+
+            val listaAux = listaComandos.subList(listaComandosOriginal.size, listaComandos.size)
+
+            var cont = listaComandos.size
+            for (x in listaAux){
+                AddCommand(cont.toString(), x, requireContext())
+                cont++
+            }
+
+        }
+
+        else if (listaComandos.size <= listaComandosOriginal.size){
+
+            val listaAux = listaComandosOriginal.subList(listaComandos.size, listaComandosOriginal.size)
+
+            var cont = listaComandosOriginal.size
+            for (x in listaAux){
+                DeleteCommand(cont.toString(), requireContext())
+                cont--
+            }
+        }
+
+        var aux = 1
+        for(x in listaComandos){
+            updateCommand(aux.toString(), x, requireContext())
+            aux++
         }
     }
 }

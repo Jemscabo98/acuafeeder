@@ -1,23 +1,22 @@
 package montoya.eduardo.acuafeeder
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
-import montoya.eduardo.acuafeeder.data_class.deviceCommand
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -25,6 +24,9 @@ import org.json.JSONObject
 class Log_In : AppCompatActivity() {
     private lateinit var queue: RequestQueue
     private val handler = Handler(Looper.getMainLooper())
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var edit: SharedPreferences.Editor
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +35,17 @@ class Log_In : AppCompatActivity() {
         val txtMail: TextView = findViewById(R.id.txtMail)
         val txtPassword: TextView = findViewById(R.id.txtPassword)
         val btnLogin: Button = findViewById(R.id.btnLogin)
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        edit = sharedPref.edit()
 
         btnLogin.setOnClickListener {
             validarUsuario(txtMail.text.toString(), txtPassword.text.toString())
+        }
+
+        val id = sharedPref.getInt("idUser", 0)
+        if (id != 0){
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            this.startActivity(intent)
         }
     }
 
@@ -47,23 +57,29 @@ class Log_In : AppCompatActivity() {
 
         val request: StringRequest =
             object : StringRequest(Request.Method.POST, URLAux, {
-               if (it.contains("users_email")){
-                   val intent = Intent(applicationContext, MainActivity::class.java)
+                if (it.contains("users_email")) {
+                    val intent = Intent(applicationContext, MainActivity::class.java)
 
-                   var jsonArray: JSONArray? = null
-                   try {
-                       jsonArray= JSONArray(it)
-                       var jsonObject = JSONObject(jsonArray[0].toString())
-                       GlobalData.idUser = jsonObject.getString("users_id").toInt()
-                       //Toast.makeText(this, jsonObject.getString("users_id"), Toast.LENGTH_LONG).show()
-                   } catch (error: JSONException) {
-                       Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show()
-                   }
+                    var jsonArray: JSONArray? = null
+                    try {
+                        jsonArray = JSONArray(it)
+                        val jsonObject = JSONObject(jsonArray[0].toString())
+                        GlobalData.idUser = jsonObject.getString("users_id").toInt()
 
-                   this.startActivity(intent)
-               }else{
-                   Toast.makeText(this, "El usuario o la contraseña no fueron correctamente ingresados", Toast.LENGTH_SHORT).show()
-               }
+                        edit.putInt("idUser", GlobalData.idUser)
+                        edit.commit()
+
+                        //Toast.makeText(this, jsonObject.getString("users_id"), Toast.LENGTH_LONG).show()
+                    } catch (error: JSONException) {
+                        Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show()
+                    }
+
+                    this.startActivity(intent)
+                } else {
+                    Toast.makeText(this,
+                        "El usuario o la contraseña no fueron correctamente ingresados",
+                        Toast.LENGTH_SHORT).show()
+                }
             }, { error: VolleyError ->
                 println("Error $error.message")
                 Toast.makeText(this, "Error de conexion", Toast.LENGTH_SHORT).show()
@@ -79,6 +95,9 @@ class Log_In : AppCompatActivity() {
         queue = Volley.newRequestQueue(this)
         request.setShouldCache(false)
         queue.add(request)
+    }
+
+    override fun onBackPressed() {
     }
 
 }
