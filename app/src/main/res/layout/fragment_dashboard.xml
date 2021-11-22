@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment"
     android:orientation="vertical"
-    android:background="@color/blue_background"
+    android:background="@color/white"
     android:paddingTop="10dp">
 
     <LinearLayout
@@ -48,9 +48,7 @@
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
+                    android:layout_gravity="start"
                     style="@style/spinner_style"
                     android:textColor="@color/white"/>
 
@@ -80,8 +78,7 @@
                     android:textAlignment="center"
                     android:textSize="17sp"
                     android:textStyle="bold"
-                    android:text="100"
-                    android:textColor="@color/black"
+                    android:textColor="@color/sea_blue"
                     android:autofillHints="Max 100"
                     android:background="@color/white"
                     android:inputType="number"
@@ -151,8 +148,9 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
                 android:textAlignment="center"
+                android:textColor="@color/sea_blue"
                 android:text="@string/txtPrcAli"
                 android:textStyle="bold"/>
 
@@ -160,7 +158,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="14dp"
+                android:textColor="@color/sea_blue"
+                android:layout_marginStart="14dp"
                 android:text="@string/txttHoraI"
                 android:textStyle="bold"/>
 
@@ -168,7 +167,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:textColor="@color/sea_blue"
+                android:layout_marginStart="8dp"
                 android:text="@string/txttHoraF"
                 android:textStyle="bold"/>
 

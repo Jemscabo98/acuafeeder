@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".InformationFragment"
-    android:background="@color/blue_background"
+    android:background="@color/white"
     android:paddingTop="10dp">
 
     <LinearLayout
@@ -44,7 +44,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/numPiscina"
-                        android:textColor="@color/white"
+                        android:textColor="@color/sea_blue"
                         android:layout_gravity="center"
                         android:textSize="17sp"/>
 
@@ -54,12 +54,13 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
                         android:textSize="17sp"
-                        android:background="@color/white"
+                        android:background="@drawable/border_textview"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:text="@string/numExp"
                         android:autofillHints="Solo Numeros"
-                        android:inputType="numberDecimal" />
+                        android:inputType="numberDecimal"
+                        tools:ignore="LabelFor" />
 
                     <Button
                         android:id="@+id/btnBuscarDispositivos"
@@ -73,14 +74,11 @@
 
                 <Spinner
                     android:id="@+id/selectDevice"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    style="@style/spinner_style"
-                    android:textColor="@color/white"/>
+                    android:layout_gravity="start"
+                    style="@style/spinner_style"/>
 
             </LinearLayout>
 
@@ -88,8 +86,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:orientation="vertical">
 
                 <Button
@@ -149,7 +147,7 @@
                 android:layout_marginBottom="132dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                android:textColor="@color/sea_blue"
                 android:text="TEMPERATURA °C"/>
         </LinearLayout>
 

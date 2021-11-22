@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -148,6 +149,10 @@ class DashboardFragment : Fragment() {
                     position: Int,
                     id: Long
                 ) {
+                    if (parent != null) {
+                        (parent.getChildAt(0) as TextView).setTextColor(Color.WHITE)
+                    }
+
                     for (x in GlobalData.listaComida){
                         if(x.idFood == selectComida.selectedItem.toString()){
                             GlobalData.selectFood = x

@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         txtProgreso = actbar.customView.findViewById(R.id.txtProgreso)
 
         //Barra de navegacion inferior
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)

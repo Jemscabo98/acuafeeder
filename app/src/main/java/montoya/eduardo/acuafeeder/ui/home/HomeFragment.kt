@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.android.volley.RequestQueue
 import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.ValueDependentColor
 import com.jjoe64.graphview.helper.StaticLabelsFormatter
 import com.jjoe64.graphview.series.BarGraphSeries
 import com.jjoe64.graphview.series.DataPoint
@@ -108,6 +109,10 @@ class HomeFragment : Fragment() {
             //Se agrega los tag (hora) en la axis x
             val labels = ArrayList<String>()
             var maxValue: Double = 0.0
+
+            series.setValueDependentColor(ValueDependentColor<DataPoint> { data ->
+                Color.rgb(15,33,120)
+            })
 
             for (x in GlobalData.listaComandos) {
 

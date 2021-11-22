@@ -164,6 +164,10 @@ class InformationFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
+                if (parent != null) {
+                    (parent.getChildAt(0) as TextView).setTextColor(Color.WHITE)
+                }
+
                 for (x in GlobalData.listaDevices){
                     if(x.devices_etiqueta == selectDevice.selectedItem.toString()){
                         GlobalData.deviceTemp = x.idDevices
