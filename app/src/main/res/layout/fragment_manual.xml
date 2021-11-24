@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Manual"
-    android:background="@drawable/fondo"
+    android:background="@mipmap/fondo"
     android:paddingTop="10dp">
 
 <LinearLayout
@@ -53,24 +53,28 @@
                 android:textColor="@color/white"
                 android:gravity="center"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnEntrar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="@string/btnEntrar"
                 android:textSize="14sp"
+                android:textColor="@color/white"
+                android:background="@drawable/border"
                 android:layout_marginTop="4dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSalir"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="@string/btnSalir"
                 android:textSize="14sp"
+                android:textColor="@color/white"
+                android:background="@drawable/border"
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
@@ -110,24 +114,28 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnOn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="@string/ON"
                 android:textSize="14sp"
+                android:textColor="@color/white"
+                android:background="@drawable/border"
                 android:layout_marginTop="4dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnOff"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="@string/OFF"
                 android:textSize="14sp"
+                android:textColor="@color/white"
+                android:background="@drawable/border"
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
