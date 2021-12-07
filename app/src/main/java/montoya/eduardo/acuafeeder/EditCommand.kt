@@ -16,20 +16,10 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import montoya.eduardo.acuafeeder.data_class.Command
-import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.updateCommand
-import org.json.JSONException
-import org.json.JSONObject
 
 class EditCommand : Fragment() {
     private lateinit var queue: RequestQueue

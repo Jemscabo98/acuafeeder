@@ -24,7 +24,6 @@ import montoya.eduardo.acuafeeder.Log_In
 import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
 import montoya.eduardo.acuafeeder.data_class.GlobalData
-import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.idUser
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerComandos
 
 

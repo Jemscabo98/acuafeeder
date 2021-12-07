@@ -3,7 +3,6 @@ package montoya.eduardo.acuafeeder.data_class
 import android.app.Application
 import android.content.ContentValues
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
@@ -455,7 +454,6 @@ open class GlobalData: Application() {
        fun obtenerTempBD(context: Context){
            val URLAux = URL + "buscar_temp.php?date=" + fechaTemp + "&idDevices=" + deviceTemp
 
-           Log.d(ContentValues.TAG, "URL: $URLAux")
            var aux = ""
 
            val jsonArrayRequest: JsonArrayRequest = JsonArrayRequest(

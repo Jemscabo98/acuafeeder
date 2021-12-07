@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,21 +17,15 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import montoya.eduardo.acuafeeder.EditCommand
 import montoya.eduardo.acuafeeder.MainActivity
 import montoya.eduardo.acuafeeder.R
-import montoya.eduardo.acuafeeder.data_class.Command
 import montoya.eduardo.acuafeeder.data_class.Devices
 import montoya.eduardo.acuafeeder.data_class.GlobalData
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.agregarDevicesBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.agregarDevicesCommandBD
 import montoya.eduardo.acuafeeder.data_class.GlobalData.Companion.obtenerDevicesBD
-import montoya.eduardo.acuafeeder.ui.dashboard.AdapterComando
-import org.json.JSONException
-import org.json.JSONObject
 import java.sql.Timestamp
 
 class NotificationsFragment : Fragment() {

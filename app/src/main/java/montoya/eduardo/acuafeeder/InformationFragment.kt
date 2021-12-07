@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -114,7 +113,6 @@ class InformationFragment : Fragment() {
 
             mDateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
                 mes = month + 1
-                Log.d(TAG, "onDateSet: date: $year/$mes/$dayOfMonth")
                 GlobalData.fechaTemp = "$year-$mes-$dayOfMonth"
                 txtSelecFecha.text = "<$dayOfMonth-$mes-$year>"
             }
